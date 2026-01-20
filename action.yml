@@ -1,0 +1,26 @@
+name: 'Setup GitHub Copilot CLI'
+description: 'Install and setup GitHub Copilot CLI for use in GitHub Actions workflows'
+author: 'mvkaran'
+branding:
+  icon: 'terminal'
+  color: 'blue'
+
+inputs:
+  version:
+    description: 'Version of Copilot CLI to install (e.g., "latest", "v0.0.369", or "prerelease")'
+    required: false
+    default: 'latest'
+  token:
+    description: 'GitHub token for authentication (defaults to github.token)'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  version:
+    description: 'The installed version of Copilot CLI'
+  path:
+    description: 'Path to the Copilot CLI executable'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
