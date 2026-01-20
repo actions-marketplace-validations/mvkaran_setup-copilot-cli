@@ -1,0 +1,72 @@
+name: Test Action
+
+on:
+  push:
+    branches: [ main, copilot/** ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-action-ubuntu:
+    name: Test on Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub Copilot CLI
+        id: setup-copilot
+        uses: ./
+        with:
+          version: 'latest'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify installation
+        run: |
+          echo "Version: ${{ steps.setup-copilot.outputs.version }}"
+          echo "Path: ${{ steps.setup-copilot.outputs.path }}"
+          copilot --version
+          copilot --help
+
+  test-action-macos:
+    name: Test on macOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub Copilot CLI
+        id: setup-copilot
+        uses: ./
+        with:
+          version: 'latest'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify installation
+        run: |
+          echo "Version: ${{ steps.setup-copilot.outputs.version }}"
+          echo "Path: ${{ steps.setup-copilot.outputs.path }}"
+          copilot --version
+          copilot --help
+
+  test-action-windows:
+    name: Test on Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub Copilot CLI
+        id: setup-copilot
+        uses: ./
+        with:
+          version: 'latest'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify installation
+        run: |
+          echo "Version: ${{ steps.setup-copilot.outputs.version }}"
+          echo "Path: ${{ steps.setup-copilot.outputs.path }}"
+          copilot --version
+          copilot --help

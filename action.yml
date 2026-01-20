@@ -11,9 +11,8 @@ inputs:
     required: false
     default: 'latest'
   token:
-    description: 'GitHub token for authentication (defaults to github.token)'
+    description: 'GitHub token for authentication'
     required: false
-    default: ${{ github.token }}
 
 outputs:
   version:
