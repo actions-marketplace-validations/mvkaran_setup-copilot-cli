@@ -4,7 +4,6 @@ import * as tc from '@actions/tool-cache';
 import * as io from '@actions/io';
 import * as os from 'os';
 import * as path from 'path';
-import * as fs from 'fs';
 
 /**
  * Detects the current platform and architecture
