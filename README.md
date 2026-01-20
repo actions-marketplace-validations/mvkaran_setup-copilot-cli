@@ -137,7 +137,7 @@ If you see an error about unsupported platform or architecture:
 
 ## License
 
-This project is licensed under the ISC License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
