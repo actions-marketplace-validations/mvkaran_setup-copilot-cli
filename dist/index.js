@@ -30104,6 +30104,26 @@ var toolCacheExports = requireToolCache();
 var ioExports = requireIo();
 
 /**
+ * Validates the version input
+ */
+function validateVersion(version) {
+  // Allow 'latest' and 'prerelease'
+  if (version === 'latest' || version === 'prerelease') {
+    return true;
+  }
+  
+  // Validate version format (e.g., v0.0.369, 0.0.369)
+  // Must be alphanumeric with dots, hyphens, and optionally start with 'v'
+  const versionPattern = /^v?\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?$/;
+  
+  if (!versionPattern.test(version)) {
+    throw new Error(`Invalid version format: ${version}. Expected format: 'latest', 'prerelease', or semantic version (e.g., 'v0.0.369' or '1.2.3')`);
+  }
+  
+  return true;
+}
+
+/**
  * Detects the current platform and architecture
  */
 function getPlatformInfo() {
@@ -30276,6 +30296,9 @@ async function run() {
     // Get inputs
     const version = coreExports.getInput('version') || 'latest';
     const token = coreExports.getInput('token');
+    
+    // Validate version input
+    validateVersion(version);
     
     coreExports.info(`Requested version: ${version}`);
     
