@@ -4,7 +4,6 @@ import * as tc from '@actions/tool-cache';
 import * as io from '@actions/io';
 import * as os from 'os';
 import * as path from 'path';
-import * as pty from 'node-pty';
 import { ensureNodeAndNpm } from './nodeUtils.js';
 
 /**
@@ -159,6 +158,9 @@ function normalizeVersion(version) {
 
 async function verifyWithToken(tokenSource) {
   core.info(`Validating Copilot CLI startup using ${tokenSource}...`);
+
+  // Dynamically import node-pty (installed globally during setup)
+  const pty = await import('node-pty');
 
   const combinedOutput = await new Promise((resolve, reject) => {
     // We use Copilot CLI here with interactive TTY. Use node-pty to provide one,

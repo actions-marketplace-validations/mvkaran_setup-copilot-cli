@@ -32,6 +32,21 @@ import require$$3$2 from 'child_process';
 import require$$6$1 from 'timers';
 import require$$2$2 from 'tty';
 
+function _mergeNamespaces(n, m) {
+	m.forEach(function (e) {
+		e && typeof e !== 'string' && !Array.isArray(e) && Object.keys(e).forEach(function (k) {
+			if (k !== 'default' && !(k in n)) {
+				var d = Object.getOwnPropertyDescriptor(e, k);
+				Object.defineProperty(n, k, d.get ? d : {
+					enumerable: true,
+					get: function () { return e[k]; }
+				});
+			}
+		});
+	});
+	return Object.freeze(n);
+}
+
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 var core = {};
@@ -30105,6 +30120,475 @@ var toolCacheExports = requireToolCache();
 
 var ioExports = requireIo();
 
+/**
+ * Ensures Node.js and npm are installed and meet minimum versions
+ */
+async function ensureNodeAndNpm(platformInfo, minNodeMajor = 24, minNpmMajor = 10) {
+  const getVersion = async (command, args) => {
+    let output = '';
+    await execExports.exec(command, args, {
+      listeners: {
+        stdout: (data) => {
+          output += data.toString();
+        }
+      },
+      silent: true
+    });
+    return output.trim();
+  };
+
+  const parseMajor = (version) => {
+    const match = version.match(/v?(\d+)/);
+    return match ? Number(match[1]) : NaN;
+  };
+
+  const resolveNodeFilename = (shasums, platform, arch) => {
+    const suffix = (() => {
+      if (platform === 'windows') {
+        return arch === 'arm64' ? 'win-arm64.zip' : 'win-x64.zip';
+      }
+      if (platform === 'macos') {
+        return arch === 'arm64' ? 'darwin-arm64.tar.gz' : 'darwin-x64.tar.gz';
+      }
+      return arch === 'arm64' ? 'linux-arm64.tar.gz' : 'linux-x64.tar.gz';
+    })();
+
+    const line = shasums
+      .split(/\r?\n/)
+      .find((entry) => entry.includes(`-${suffix}`) && entry.includes('node-v'));
+
+    if (!line) {
+      throw new Error(`Unable to resolve Node.js binary for ${platform} ${arch}.`);
+    }
+
+    return line.trim().split(/\s+/).pop();
+  };
+
+  const installNodeAndNpm = async () => {
+    const baseUrl = `https://nodejs.org/dist/latest-v${minNodeMajor}.x/`;
+    coreExports.info(`Downloading Node.js from ${baseUrl}`);
+
+    const shasumsPath = await toolCacheExports.downloadTool(`${baseUrl}SHASUMS256.txt`);
+    const shasums = require$$0.readFileSync(shasumsPath, 'utf8');
+
+    const filename = resolveNodeFilename(shasums, platformInfo.platform, platformInfo.arch);
+    const downloadUrl = `${baseUrl}${filename}`;
+
+    coreExports.info(`Resolved Node.js package: ${filename}`);
+    const archivePath = await toolCacheExports.downloadTool(downloadUrl);
+
+    let extractedPath;
+    if (filename.endsWith('.zip')) {
+      extractedPath = await toolCacheExports.extractZip(archivePath);
+    } else {
+      extractedPath = await toolCacheExports.extractTar(archivePath);
+    }
+
+    const entries = require$$0.readdirSync(extractedPath);
+    const rootEntry = entries.length === 1 ? entries[0] : null;
+    const rootPath = rootEntry ? path.join(extractedPath, rootEntry) : extractedPath;
+    const binPath = platformInfo.platform === 'windows'
+      ? rootPath
+      : path.join(rootPath, 'bin');
+
+    coreExports.addPath(binPath);
+    coreExports.info(`Added Node.js to PATH: ${binPath}`);
+  };
+
+  const checkVersions = async () => {
+    const nodePath = await ioExports.which('node', false);
+    const npmPath = await ioExports.which('npm', false);
+
+    if (!nodePath || !npmPath) {
+      return { ok: false, nodeVersion: null, npmVersion: null };
+    }
+
+    const nodeVersion = await getVersion('node', ['--version']);
+    const npmVersion = await getVersion('npm', ['--version']);
+
+    const nodeMajor = parseMajor(nodeVersion);
+    const npmMajor = parseMajor(npmVersion);
+
+    const ok = Number.isFinite(nodeMajor)
+      && Number.isFinite(npmMajor)
+      && nodeMajor >= minNodeMajor
+      && npmMajor >= minNpmMajor;
+
+    return { ok, nodeVersion, npmVersion, nodeMajor, npmMajor };
+  };
+
+  let check = await checkVersions();
+
+  if (!check.ok) {
+    const detectedNode = check.nodeVersion ?? 'unknown';
+    const detectedNpm = check.npmVersion ?? 'unknown';
+    coreExports.info(`Detected Node.js: ${detectedNode}; required: ${minNodeMajor}+`);
+    coreExports.info(`Detected npm: ${detectedNpm}; required: ${minNpmMajor}+`);
+    coreExports.info('Installing required Node.js/npm versions...');
+    await installNodeAndNpm();
+    check = await checkVersions();
+  }
+
+  if (!check.ok) {
+    const detectedNode = check.nodeVersion ?? 'unknown';
+    const detectedNpm = check.npmVersion ?? 'unknown';
+    throw new Error(`Node.js ${minNodeMajor}+ and npm ${minNpmMajor}+ are required. Detected Node.js ${detectedNode}, npm ${detectedNpm}.`);
+  }
+
+  coreExports.info(`Node.js version OK: ${check.nodeVersion}`);
+  coreExports.info(`npm version OK: ${check.npmVersion}`);
+
+  // Install node-pty globally for the action to use
+  coreExports.info('Installing node-pty globally...');
+  try {
+    await execExports.exec('npm', ['install', '-g', 'node-pty@1.0.0']);
+    coreExports.info('node-pty installed successfully');
+  } catch (error) {
+    throw new Error(`Failed to install node-pty: ${error.message}`);
+  }
+}
+
+/**
+ * Validates the version input
+ */
+function validateVersion(version) {
+  // Allow 'latest' and 'prerelease'
+  if (version === 'latest' || version === 'prerelease') {
+    return true;
+  }
+  
+  // Validate version format (e.g., v0.0.369, 0.0.369)
+  // Must be alphanumeric with dots, hyphens, and optionally start with 'v'
+  const versionPattern = /^v?\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?$/;
+  
+  if (!versionPattern.test(version)) {
+    throw new Error(`Invalid version format: ${version}. Expected format: 'latest', 'prerelease', or semantic version (e.g., 'v0.0.369' or '1.2.3')`);
+  }
+  
+  return true;
+}
+
+/**
+ * Detects the current platform and architecture
+ */
+function getPlatformInfo() {
+  const platform = require$$0$1.platform();
+  const arch = require$$0$1.arch();
+  
+  coreExports.info(`Detected platform: ${platform}`);
+  coreExports.info(`Detected architecture: ${arch}`);
+  
+  let platformName;
+  if (platform === 'win32') {
+    platformName = 'windows';
+  } else if (platform === 'darwin') {
+    platformName = 'macos';
+  } else if (platform === 'linux') {
+    platformName = 'linux';
+  } else {
+    throw new Error(`Unsupported platform: ${platform}. Copilot CLI supports Linux, macOS, and Windows.`);
+  }
+  
+  // Check architecture support
+  // Copilot CLI supports x64 and arm64
+  if (arch !== 'x64' && arch !== 'arm64') {
+    throw new Error(`Unsupported architecture: ${arch}. Copilot CLI supports x64 and arm64 architectures.`);
+  }
+  
+  return { platform: platformName, arch };
+}
+
+
+/**
+ * Installs Copilot CLI using npm
+ */
+async function installVianpm(version) {
+  coreExports.info('Installing Copilot CLI via npm...');
+  
+  let packageName = '@github/copilot';
+  
+  if (version === 'prerelease') {
+    packageName += '@prerelease';
+  } else if (version !== 'latest') {
+    packageName += `@${version}`;
+  }
+  
+  coreExports.info(`Installing package: ${packageName}`);
+  
+  try {
+    await execExports.exec('npm', ['install', '-g', packageName]);
+    coreExports.info('Copilot CLI installed successfully via npm');
+    return true;
+  } catch (error) {
+    coreExports.warning(`Failed to install via npm: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Installs Copilot CLI using the install script (Linux/macOS only)
+ */
+async function installViaScript(version, platformInfo) {
+  coreExports.info('Installing Copilot CLI via install script...');
+  
+  if (platformInfo.platform === 'windows') {
+    coreExports.warning('Install script not supported on Windows');
+    return false;
+  }
+  
+  try {
+    // Download the install script
+    const scriptUrl = 'https://gh.io/copilot-install';
+    const scriptPath = path.join(require$$0$1.tmpdir(), 'copilot-install.sh');
+    
+    coreExports.info(`Downloading install script from ${scriptUrl}`);
+    const downloadedPath = await toolCacheExports.downloadTool(scriptUrl, scriptPath);
+    
+    // Make the script executable
+    await execExports.exec('chmod', ['+x', downloadedPath]);
+    
+    // Prepare environment variables
+    const env = { ...process.env };
+    
+    if (version !== 'latest' && version !== 'prerelease') {
+      env.VERSION = version;
+      coreExports.info(`Setting VERSION=${version}`);
+    }
+    
+    // Set PREFIX to install in a location accessible to the workflow
+    const installDir = path.join(require$$0$1.homedir(), '.local');
+    env.PREFIX = installDir;
+    coreExports.info(`Setting PREFIX=${installDir}`);
+    
+    // Execute the install script
+    await execExports.exec('bash', [downloadedPath], { env });
+    
+    // Add to PATH
+    const binPath = path.join(installDir, 'bin');
+    coreExports.addPath(binPath);
+    coreExports.info(`Added ${binPath} to PATH`);
+    
+    coreExports.info('Copilot CLI installed successfully via install script');
+    return true;
+  } catch (error) {
+    coreExports.warning(`Failed to install via script: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Verifies the installation and tests if Copilot CLI can be started
+ */
+async function getCopilotVersion() {
+  let versionOutput = '';
+  await execExports.exec('copilot', ['-v'], {
+    listeners: {
+      stdout: (data) => {
+        versionOutput += data.toString();
+      }
+    },
+    silent: true
+  });
+
+  return versionOutput.trim();
+}
+
+function normalizeVersion(version) {
+  if (!version) return '';
+  return version.trim().replace(/^v/, '');
+}
+
+async function verifyWithToken(tokenSource) {
+  coreExports.info(`Validating Copilot CLI startup using ${tokenSource}...`);
+
+  // Dynamically import node-pty (installed globally during setup)
+  const pty = await Promise.resolve().then(function () { return index; });
+
+  const combinedOutput = await new Promise((resolve, reject) => {
+    // We use Copilot CLI here with interactive TTY. Use node-pty to provide one,
+    // capture early output, then exit with Ctrl+C.
+    const ptyProcess = pty.spawn('copilot', ['-i'], {
+      name: 'xterm-color',
+      cols: 80,
+      rows: 24,
+      cwd: process.cwd(),
+      env: process.env
+    });
+
+    const chunks = [];
+    ptyProcess.onData((data) => {
+      if (data) {
+        chunks.push(data.toString());
+      }
+    });
+
+    // Give the CLI time to print startup/auth output, then send Ctrl+C twice
+    // to gracefully stop the interactive session.
+    const killAfter = setTimeout(() => {
+      ptyProcess.write('\x03');
+      setTimeout(() => ptyProcess.write('\x03'), 250);
+    }, 5000);
+
+    // Safety net to avoid hanging if Ctrl+C is ignored.
+    const hardKill = setTimeout(() => {
+      ptyProcess.kill();
+    }, 8000);
+
+    ptyProcess.onExit((event) => {
+      clearTimeout(killAfter);
+      clearTimeout(hardKill);
+      if (event.exitCode !== 0 && chunks.length === 0) {
+        reject(new Error(`Copilot CLI exited with code ${event.exitCode}.`));
+        return;
+      }
+      const output = chunks.join('');
+      coreExports.info(`Copilot CLI TTY output:\n${output}`);
+      resolve(output);
+    });
+  });
+
+  const loginPattern = /logged in as user|welcome\s+\S+/i;
+
+  if (!loginPattern.test(combinedOutput)) {
+    throw new Error(
+      `Copilot CLI did not emit a logged-in/welcome message. Validation attempted with ${tokenSource}. `
+      + `Expected output to include "logged in as user" or "welcome <username>". `
+      + `Captured output:\n${combinedOutput}`
+    );
+  }
+}
+
+async function verifyWithoutToken(requestedVersion) {
+  coreExports.info('Validating Copilot CLI binary and version (token not provided)...');
+
+  const installedVersion = await getCopilotVersion();
+  coreExports.info(`Copilot CLI version: ${installedVersion}`);
+
+  if (requestedVersion === 'latest' || requestedVersion === 'prerelease') {
+    return installedVersion;
+  }
+
+  const desired = normalizeVersion(requestedVersion);
+  const installed = normalizeVersion(installedVersion);
+
+  if (!installed.includes(desired)) {
+    throw new Error(`Installed Copilot CLI version (${installedVersion}) does not match requested version (${requestedVersion}).`);
+  }
+
+  return installedVersion;
+}
+
+async function verifyInstallation(requestedVersion, hasToken, tokenSource) {
+  coreExports.info('Verifying Copilot CLI installation...');
+
+  try {
+    const copilotPath = await ioExports.which('copilot', false);
+
+    if (!copilotPath) {
+      throw new Error('Copilot CLI not found in PATH');
+    }
+
+    coreExports.info(`Copilot CLI found at: ${copilotPath}`);
+
+    let version = null;
+
+    if (hasToken) {
+      await verifyWithToken(tokenSource);
+      version = await getCopilotVersion();
+      coreExports.info(`✓ Copilot CLI started successfully using ${tokenSource}`);
+    } else {
+      version = await verifyWithoutToken(requestedVersion);
+      coreExports.info('✓ Copilot CLI binary is available and version validated');
+    }
+
+    return { success: true, version, path: copilotPath };
+  } catch (error) {
+    coreExports.warning(`Verification failed: ${error.message}`);
+    return { success: false, version: null, path: null };
+  }
+}
+
+/**
+ * Main action entrypoint
+ */
+async function run() {
+  try {
+    coreExports.info('Setting up GitHub Copilot CLI...');
+    
+    // Get inputs
+    const version = coreExports.getInput('version') || 'latest';
+    const token = coreExports.getInput('token');
+    const envGhToken = process.env.GH_TOKEN;
+    const envGithubToken = process.env.GITHUB_TOKEN;
+    const tokenFromEnv = envGhToken || envGithubToken;
+    const hasToken = Boolean(token || tokenFromEnv);
+    const tokenSource = token
+      ? 'input token'
+      : envGhToken
+        ? 'GH_TOKEN env'
+        : envGithubToken
+          ? 'GITHUB_TOKEN env'
+          : 'no token';
+    
+    // Validate version input
+    validateVersion(version);
+    
+    coreExports.info(`Requested version: ${version}`);
+    
+    // Set GitHub token as environment variable if provided
+    if (token) {
+      coreExports.exportVariable('GH_TOKEN', token);
+      coreExports.info('GH_TOKEN configured from input token');
+    } else if (envGhToken) {
+      coreExports.info('Using existing GH_TOKEN from environment');
+    } else if (envGithubToken) {
+      coreExports.exportVariable('GH_TOKEN', envGithubToken);
+      coreExports.info('GH_TOKEN configured from GITHUB_TOKEN environment variable');
+    }
+    
+    // Detect platform and architecture - this will throw if unsupported
+    const platformInfo = getPlatformInfo();
+    coreExports.info(`Platform: ${platformInfo.platform}, Architecture: ${platformInfo.arch}`);
+    
+    // Try to install
+    let installed = false;
+    
+    // Try npm first (works on all platforms)
+    await ensureNodeAndNpm(platformInfo);
+    installed = await installVianpm(version);
+    
+    // If npm failed and we're on Linux/macOS, try the install script
+    if (!installed && (platformInfo.platform === 'linux' || platformInfo.platform === 'macos')) {
+      coreExports.info('Attempting installation via install script...');
+      installed = await installViaScript(version, platformInfo);
+    }
+    
+    if (!installed) {
+      throw new Error('Failed to install Copilot CLI using any available method');
+    }
+    
+    // Verify installation and that CLI can be started
+    const verification = await verifyInstallation(version, hasToken, tokenSource);
+    
+    if (!verification.success) {
+      throw new Error('Copilot CLI was installed but verification failed. The CLI cannot be started.');
+    }
+    
+    // Set outputs
+    coreExports.setOutput('version', verification.version);
+    coreExports.setOutput('path', verification.path);
+    
+    coreExports.info('✅ GitHub Copilot CLI setup completed successfully!');
+    coreExports.info(`Version: ${verification.version}`);
+    coreExports.info(`Path: ${verification.path}`);
+    
+  } catch (error) {
+    coreExports.setFailed(`Action failed: ${error.message}`);
+  }
+}
+
+run();
+
 var lib = {};
 
 function commonjsRequire(path) {
@@ -31517,460 +32001,7 @@ function requireLib () {
 
 var libExports = requireLib();
 
-/**
- * Ensures Node.js and npm are installed and meet minimum versions
- */
-async function ensureNodeAndNpm(platformInfo, minNodeMajor = 24, minNpmMajor = 10) {
-  const getVersion = async (command, args) => {
-    let output = '';
-    await execExports.exec(command, args, {
-      listeners: {
-        stdout: (data) => {
-          output += data.toString();
-        }
-      },
-      silent: true
-    });
-    return output.trim();
-  };
-
-  const parseMajor = (version) => {
-    const match = version.match(/v?(\d+)/);
-    return match ? Number(match[1]) : NaN;
-  };
-
-  const resolveNodeFilename = (shasums, platform, arch) => {
-    const suffix = (() => {
-      if (platform === 'windows') {
-        return arch === 'arm64' ? 'win-arm64.zip' : 'win-x64.zip';
-      }
-      if (platform === 'macos') {
-        return arch === 'arm64' ? 'darwin-arm64.tar.gz' : 'darwin-x64.tar.gz';
-      }
-      return arch === 'arm64' ? 'linux-arm64.tar.gz' : 'linux-x64.tar.gz';
-    })();
-
-    const line = shasums
-      .split(/\r?\n/)
-      .find((entry) => entry.includes(`-${suffix}`) && entry.includes('node-v'));
-
-    if (!line) {
-      throw new Error(`Unable to resolve Node.js binary for ${platform} ${arch}.`);
-    }
-
-    return line.trim().split(/\s+/).pop();
-  };
-
-  const installNodeAndNpm = async () => {
-    const baseUrl = `https://nodejs.org/dist/latest-v${minNodeMajor}.x/`;
-    coreExports.info(`Downloading Node.js from ${baseUrl}`);
-
-    const shasumsPath = await toolCacheExports.downloadTool(`${baseUrl}SHASUMS256.txt`);
-    const shasums = require$$0.readFileSync(shasumsPath, 'utf8');
-
-    const filename = resolveNodeFilename(shasums, platformInfo.platform, platformInfo.arch);
-    const downloadUrl = `${baseUrl}${filename}`;
-
-    coreExports.info(`Resolved Node.js package: ${filename}`);
-    const archivePath = await toolCacheExports.downloadTool(downloadUrl);
-
-    let extractedPath;
-    if (filename.endsWith('.zip')) {
-      extractedPath = await toolCacheExports.extractZip(archivePath);
-    } else {
-      extractedPath = await toolCacheExports.extractTar(archivePath);
-    }
-
-    const entries = require$$0.readdirSync(extractedPath);
-    const rootEntry = entries.length === 1 ? entries[0] : null;
-    const rootPath = rootEntry ? path.join(extractedPath, rootEntry) : extractedPath;
-    const binPath = platformInfo.platform === 'windows'
-      ? rootPath
-      : path.join(rootPath, 'bin');
-
-    coreExports.addPath(binPath);
-    coreExports.info(`Added Node.js to PATH: ${binPath}`);
-  };
-
-  const checkVersions = async () => {
-    const nodePath = await ioExports.which('node', false);
-    const npmPath = await ioExports.which('npm', false);
-
-    if (!nodePath || !npmPath) {
-      return { ok: false, nodeVersion: null, npmVersion: null };
-    }
-
-    const nodeVersion = await getVersion('node', ['--version']);
-    const npmVersion = await getVersion('npm', ['--version']);
-
-    const nodeMajor = parseMajor(nodeVersion);
-    const npmMajor = parseMajor(npmVersion);
-
-    const ok = Number.isFinite(nodeMajor)
-      && Number.isFinite(npmMajor)
-      && nodeMajor >= minNodeMajor
-      && npmMajor >= minNpmMajor;
-
-    return { ok, nodeVersion, npmVersion, nodeMajor, npmMajor };
-  };
-
-  let check = await checkVersions();
-
-  if (!check.ok) {
-    const detectedNode = check.nodeVersion ?? 'unknown';
-    const detectedNpm = check.npmVersion ?? 'unknown';
-    coreExports.info(`Detected Node.js: ${detectedNode}; required: ${minNodeMajor}+`);
-    coreExports.info(`Detected npm: ${detectedNpm}; required: ${minNpmMajor}+`);
-    coreExports.info('Installing required Node.js/npm versions...');
-    await installNodeAndNpm();
-    check = await checkVersions();
-  }
-
-  if (!check.ok) {
-    const detectedNode = check.nodeVersion ?? 'unknown';
-    const detectedNpm = check.npmVersion ?? 'unknown';
-    throw new Error(`Node.js ${minNodeMajor}+ and npm ${minNpmMajor}+ are required. Detected Node.js ${detectedNode}, npm ${detectedNpm}.`);
-  }
-
-  coreExports.info(`Node.js version OK: ${check.nodeVersion}`);
-  coreExports.info(`npm version OK: ${check.npmVersion}`);
-}
-
-/**
- * Validates the version input
- */
-function validateVersion(version) {
-  // Allow 'latest' and 'prerelease'
-  if (version === 'latest' || version === 'prerelease') {
-    return true;
-  }
-  
-  // Validate version format (e.g., v0.0.369, 0.0.369)
-  // Must be alphanumeric with dots, hyphens, and optionally start with 'v'
-  const versionPattern = /^v?\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?$/;
-  
-  if (!versionPattern.test(version)) {
-    throw new Error(`Invalid version format: ${version}. Expected format: 'latest', 'prerelease', or semantic version (e.g., 'v0.0.369' or '1.2.3')`);
-  }
-  
-  return true;
-}
-
-/**
- * Detects the current platform and architecture
- */
-function getPlatformInfo() {
-  const platform = require$$0$1.platform();
-  const arch = require$$0$1.arch();
-  
-  coreExports.info(`Detected platform: ${platform}`);
-  coreExports.info(`Detected architecture: ${arch}`);
-  
-  let platformName;
-  if (platform === 'win32') {
-    platformName = 'windows';
-  } else if (platform === 'darwin') {
-    platformName = 'macos';
-  } else if (platform === 'linux') {
-    platformName = 'linux';
-  } else {
-    throw new Error(`Unsupported platform: ${platform}. Copilot CLI supports Linux, macOS, and Windows.`);
-  }
-  
-  // Check architecture support
-  // Copilot CLI supports x64 and arm64
-  if (arch !== 'x64' && arch !== 'arm64') {
-    throw new Error(`Unsupported architecture: ${arch}. Copilot CLI supports x64 and arm64 architectures.`);
-  }
-  
-  return { platform: platformName, arch };
-}
-
-
-/**
- * Installs Copilot CLI using npm
- */
-async function installVianpm(version) {
-  coreExports.info('Installing Copilot CLI via npm...');
-  
-  let packageName = '@github/copilot';
-  
-  if (version === 'prerelease') {
-    packageName += '@prerelease';
-  } else if (version !== 'latest') {
-    packageName += `@${version}`;
-  }
-  
-  coreExports.info(`Installing package: ${packageName}`);
-  
-  try {
-    await execExports.exec('npm', ['install', '-g', packageName]);
-    coreExports.info('Copilot CLI installed successfully via npm');
-    return true;
-  } catch (error) {
-    coreExports.warning(`Failed to install via npm: ${error.message}`);
-    return false;
-  }
-}
-
-/**
- * Installs Copilot CLI using the install script (Linux/macOS only)
- */
-async function installViaScript(version, platformInfo) {
-  coreExports.info('Installing Copilot CLI via install script...');
-  
-  if (platformInfo.platform === 'windows') {
-    coreExports.warning('Install script not supported on Windows');
-    return false;
-  }
-  
-  try {
-    // Download the install script
-    const scriptUrl = 'https://gh.io/copilot-install';
-    const scriptPath = path.join(require$$0$1.tmpdir(), 'copilot-install.sh');
-    
-    coreExports.info(`Downloading install script from ${scriptUrl}`);
-    const downloadedPath = await toolCacheExports.downloadTool(scriptUrl, scriptPath);
-    
-    // Make the script executable
-    await execExports.exec('chmod', ['+x', downloadedPath]);
-    
-    // Prepare environment variables
-    const env = { ...process.env };
-    
-    if (version !== 'latest' && version !== 'prerelease') {
-      env.VERSION = version;
-      coreExports.info(`Setting VERSION=${version}`);
-    }
-    
-    // Set PREFIX to install in a location accessible to the workflow
-    const installDir = path.join(require$$0$1.homedir(), '.local');
-    env.PREFIX = installDir;
-    coreExports.info(`Setting PREFIX=${installDir}`);
-    
-    // Execute the install script
-    await execExports.exec('bash', [downloadedPath], { env });
-    
-    // Add to PATH
-    const binPath = path.join(installDir, 'bin');
-    coreExports.addPath(binPath);
-    coreExports.info(`Added ${binPath} to PATH`);
-    
-    coreExports.info('Copilot CLI installed successfully via install script');
-    return true;
-  } catch (error) {
-    coreExports.warning(`Failed to install via script: ${error.message}`);
-    return false;
-  }
-}
-
-/**
- * Verifies the installation and tests if Copilot CLI can be started
- */
-async function getCopilotVersion() {
-  let versionOutput = '';
-  await execExports.exec('copilot', ['-v'], {
-    listeners: {
-      stdout: (data) => {
-        versionOutput += data.toString();
-      }
-    },
-    silent: true
-  });
-
-  return versionOutput.trim();
-}
-
-function normalizeVersion(version) {
-  if (!version) return '';
-  return version.trim().replace(/^v/, '');
-}
-
-async function verifyWithToken(tokenSource) {
-  coreExports.info(`Validating Copilot CLI startup using ${tokenSource}...`);
-
-  const combinedOutput = await new Promise((resolve, reject) => {
-    // We use Copilot CLI here with interactive TTY. Use node-pty to provide one,
-    // capture early output, then exit with Ctrl+C.
-    const ptyProcess = libExports.spawn('copilot', ['-i'], {
-      name: 'xterm-color',
-      cols: 80,
-      rows: 24,
-      cwd: process.cwd(),
-      env: process.env
-    });
-
-    const chunks = [];
-    ptyProcess.onData((data) => {
-      if (data) {
-        chunks.push(data.toString());
-      }
-    });
-
-    // Give the CLI time to print startup/auth output, then send Ctrl+C twice
-    // to gracefully stop the interactive session.
-    const killAfter = setTimeout(() => {
-      ptyProcess.write('\x03');
-      setTimeout(() => ptyProcess.write('\x03'), 250);
-    }, 5000);
-
-    // Safety net to avoid hanging if Ctrl+C is ignored.
-    const hardKill = setTimeout(() => {
-      ptyProcess.kill();
-    }, 8000);
-
-    ptyProcess.onExit((event) => {
-      clearTimeout(killAfter);
-      clearTimeout(hardKill);
-      if (event.exitCode !== 0 && chunks.length === 0) {
-        reject(new Error(`Copilot CLI exited with code ${event.exitCode}.`));
-        return;
-      }
-      const output = chunks.join('');
-      coreExports.info(`Copilot CLI TTY output:\n${output}`);
-      resolve(output);
-    });
-  });
-
-  const loginPattern = /logged in as user|welcome\s+\S+/i;
-
-  if (!loginPattern.test(combinedOutput)) {
-    throw new Error(
-      `Copilot CLI did not emit a logged-in/welcome message. Validation attempted with ${tokenSource}. `
-      + `Expected output to include "logged in as user" or "welcome <username>". `
-      + `Captured output:\n${combinedOutput}`
-    );
-  }
-}
-
-async function verifyWithoutToken(requestedVersion) {
-  coreExports.info('Validating Copilot CLI binary and version (token not provided)...');
-
-  const installedVersion = await getCopilotVersion();
-  coreExports.info(`Copilot CLI version: ${installedVersion}`);
-
-  if (requestedVersion === 'latest' || requestedVersion === 'prerelease') {
-    return installedVersion;
-  }
-
-  const desired = normalizeVersion(requestedVersion);
-  const installed = normalizeVersion(installedVersion);
-
-  if (!installed.includes(desired)) {
-    throw new Error(`Installed Copilot CLI version (${installedVersion}) does not match requested version (${requestedVersion}).`);
-  }
-
-  return installedVersion;
-}
-
-async function verifyInstallation(requestedVersion, hasToken, tokenSource) {
-  coreExports.info('Verifying Copilot CLI installation...');
-
-  try {
-    const copilotPath = await ioExports.which('copilot', false);
-
-    if (!copilotPath) {
-      throw new Error('Copilot CLI not found in PATH');
-    }
-
-    coreExports.info(`Copilot CLI found at: ${copilotPath}`);
-
-    let version = null;
-
-    if (hasToken) {
-      await verifyWithToken(tokenSource);
-      version = await getCopilotVersion();
-      coreExports.info(`✓ Copilot CLI started successfully using ${tokenSource}`);
-    } else {
-      version = await verifyWithoutToken(requestedVersion);
-      coreExports.info('✓ Copilot CLI binary is available and version validated');
-    }
-
-    return { success: true, version, path: copilotPath };
-  } catch (error) {
-    coreExports.warning(`Verification failed: ${error.message}`);
-    return { success: false, version: null, path: null };
-  }
-}
-
-/**
- * Main action entrypoint
- */
-async function run() {
-  try {
-    coreExports.info('Setting up GitHub Copilot CLI...');
-    
-    // Get inputs
-    const version = coreExports.getInput('version') || 'latest';
-    const token = coreExports.getInput('token');
-    const envGhToken = process.env.GH_TOKEN;
-    const envGithubToken = process.env.GITHUB_TOKEN;
-    const tokenFromEnv = envGhToken || envGithubToken;
-    const hasToken = Boolean(token || tokenFromEnv);
-    const tokenSource = token
-      ? 'input token'
-      : envGhToken
-        ? 'GH_TOKEN env'
-        : envGithubToken
-          ? 'GITHUB_TOKEN env'
-          : 'no token';
-    
-    // Validate version input
-    validateVersion(version);
-    
-    coreExports.info(`Requested version: ${version}`);
-    
-    // Set GitHub token as environment variable if provided
-    if (token) {
-      coreExports.exportVariable('GH_TOKEN', token);
-      coreExports.info('GH_TOKEN configured from input token');
-    } else if (envGhToken) {
-      coreExports.info('Using existing GH_TOKEN from environment');
-    } else if (envGithubToken) {
-      coreExports.exportVariable('GH_TOKEN', envGithubToken);
-      coreExports.info('GH_TOKEN configured from GITHUB_TOKEN environment variable');
-    }
-    
-    // Detect platform and architecture - this will throw if unsupported
-    const platformInfo = getPlatformInfo();
-    coreExports.info(`Platform: ${platformInfo.platform}, Architecture: ${platformInfo.arch}`);
-    
-    // Try to install
-    let installed = false;
-    
-    // Try npm first (works on all platforms)
-    await ensureNodeAndNpm(platformInfo);
-    installed = await installVianpm(version);
-    
-    // If npm failed and we're on Linux/macOS, try the install script
-    if (!installed && (platformInfo.platform === 'linux' || platformInfo.platform === 'macos')) {
-      coreExports.info('Attempting installation via install script...');
-      installed = await installViaScript(version, platformInfo);
-    }
-    
-    if (!installed) {
-      throw new Error('Failed to install Copilot CLI using any available method');
-    }
-    
-    // Verify installation and that CLI can be started
-    const verification = await verifyInstallation(version, hasToken, tokenSource);
-    
-    if (!verification.success) {
-      throw new Error('Copilot CLI was installed but verification failed. The CLI cannot be started.');
-    }
-    
-    // Set outputs
-    coreExports.setOutput('version', verification.version);
-    coreExports.setOutput('path', verification.path);
-    
-    coreExports.info('✅ GitHub Copilot CLI setup completed successfully!');
-    coreExports.info(`Version: ${verification.version}`);
-    coreExports.info(`Path: ${verification.path}`);
-    
-  } catch (error) {
-    coreExports.setFailed(`Action failed: ${error.message}`);
-  }
-}
-
-run();
+var index = /*#__PURE__*/_mergeNamespaces({
+	__proto__: null
+}, [libExports]);
 //# sourceMappingURL=index.js.map
