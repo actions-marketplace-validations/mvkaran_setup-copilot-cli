@@ -165,7 +165,7 @@ async function verifyWithToken(tokenSource) {
   const combinedOutput = await new Promise((resolve, reject) => {
     // We use Copilot CLI here with interactive TTY. Use node-pty to provide one,
     // capture early output, then exit with Ctrl+C.
-    const ptyProcess = pty.spawn('copilot', ['-i'], {
+    const ptyProcess = pty.spawn('copilot', [], {
       name: 'xterm-color',
       cols: 80,
       rows: 24,
