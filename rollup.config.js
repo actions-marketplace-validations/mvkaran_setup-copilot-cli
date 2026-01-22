@@ -9,6 +9,7 @@ const config = {
     sourcemap: true,
     inlineDynamicImports: true,
   },
+  external: ['node-pty'],
   plugins: [commonjs(), nodeResolve({ preferBuiltins: true })],
 };
 
