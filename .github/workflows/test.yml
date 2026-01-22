@@ -26,7 +26,6 @@ jobs:
   token-input-matrix:
     name: Token input on ${{ matrix.os }}
     # Scenario 1: Validate token input path across OSes (startup validation).
-    if: secrets.COPILOT_TOKEN != ''
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -52,7 +51,6 @@ jobs:
   env-gh-token:
     name: GH_TOKEN env (Ubuntu)
     # Scenario 2: GH_TOKEN env should be used when token input is blank.
-    if: secrets.COPILOT_TOKEN != ''
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -76,7 +74,6 @@ jobs:
   env-github-token:
     name: GITHUB_TOKEN env (Ubuntu)
     # Scenario 3: GITHUB_TOKEN env should be used when GH_TOKEN is missing.
-    if: secrets.COPILOT_TOKEN != ''
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
