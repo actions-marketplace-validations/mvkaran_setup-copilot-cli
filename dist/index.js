@@ -1,35 +1,36 @@
-import * as require$$0 from 'os';
+import * as require$$0$1 from 'os';
 import require$$0__default from 'os';
-import require$$0$1 from 'crypto';
-import * as require$$1 from 'fs';
-import require$$1__default from 'fs';
+import require$$0$2 from 'crypto';
+import * as require$$0 from 'fs';
+import require$$0__default$1 from 'fs';
 import * as path from 'path';
 import path__default from 'path';
 import require$$2 from 'http';
 import require$$3 from 'https';
-import require$$0$4 from 'net';
-import require$$1$1 from 'tls';
+import require$$0$5 from 'net';
+import require$$1 from 'tls';
 import require$$4 from 'events';
-import require$$0$3 from 'assert';
-import require$$0$2 from 'util';
-import require$$0$5 from 'stream';
+import require$$0$4 from 'assert';
+import require$$0$3 from 'util';
+import require$$0$6 from 'stream';
 import require$$7 from 'buffer';
 import require$$8 from 'querystring';
 import require$$14 from 'stream/web';
-import require$$0$7 from 'node:stream';
-import require$$1$2 from 'node:util';
-import require$$0$6 from 'node:events';
-import require$$0$8 from 'worker_threads';
+import require$$0$8 from 'node:stream';
+import require$$1$1 from 'node:util';
+import require$$0$7 from 'node:events';
+import require$$0$9 from 'worker_threads';
 import require$$2$1 from 'perf_hooks';
 import require$$5 from 'util/types';
 import require$$4$1 from 'async_hooks';
-import require$$1$3 from 'console';
-import require$$1$4 from 'url';
+import require$$1$2 from 'console';
+import require$$1$3 from 'url';
 import require$$3$1 from 'zlib';
 import require$$6 from 'string_decoder';
-import require$$0$9 from 'diagnostics_channel';
-import require$$2$2, { spawn } from 'child_process';
+import require$$0$a from 'diagnostics_channel';
+import require$$3$2 from 'child_process';
 import require$$6$1 from 'timers';
+import require$$2$2 from 'tty';
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -37,18 +38,18 @@ var core = {};
 
 var command = {};
 
-var utils$1 = {};
+var utils$2 = {};
 
-var hasRequiredUtils$1;
+var hasRequiredUtils$2;
 
-function requireUtils$1 () {
-	if (hasRequiredUtils$1) return utils$1;
-	hasRequiredUtils$1 = 1;
+function requireUtils$2 () {
+	if (hasRequiredUtils$2) return utils$2;
+	hasRequiredUtils$2 = 1;
 	// We use any as a valid input type
 	/* eslint-disable @typescript-eslint/no-explicit-any */
-	Object.defineProperty(utils$1, "__esModule", { value: true });
-	utils$1.toCommandValue = toCommandValue;
-	utils$1.toCommandProperties = toCommandProperties;
+	Object.defineProperty(utils$2, "__esModule", { value: true });
+	utils$2.toCommandValue = toCommandValue;
+	utils$2.toCommandProperties = toCommandProperties;
 	/**
 	 * Sanitizes an input into a string so it can be passed into issueCommand safely
 	 * @param input input to sanitize into a string
@@ -82,7 +83,7 @@ function requireUtils$1 () {
 	    };
 	}
 	
-	return utils$1;
+	return utils$2;
 }
 
 var hasRequiredCommand;
@@ -127,7 +128,7 @@ function requireCommand () {
 	command.issueCommand = issueCommand;
 	command.issue = issue;
 	const os = __importStar(require$$0__default);
-	const utils_1 = requireUtils$1();
+	const utils_1 = requireUtils$2();
 	/**
 	 * Issues a command to the GitHub Actions runner
 	 *
@@ -266,10 +267,10 @@ function requireFileCommand () {
 	fileCommand.prepareKeyValueMessage = prepareKeyValueMessage;
 	// We use any as a valid input type
 	/* eslint-disable @typescript-eslint/no-explicit-any */
-	const crypto = __importStar(require$$0$1);
-	const fs = __importStar(require$$1__default);
+	const crypto = __importStar(require$$0$2);
+	const fs = __importStar(require$$0__default$1);
 	const os = __importStar(require$$0__default);
-	const utils_1 = requireUtils$1();
+	const utils_1 = requireUtils$2();
 	function issueFileCommand(command, message) {
 	    const filePath = process.env[`GITHUB_${command}`];
 	    if (!filePath) {
@@ -302,7 +303,7 @@ function requireFileCommand () {
 
 var oidcUtils = {};
 
-var lib = {};
+var lib$1 = {};
 
 var proxy = {};
 
@@ -414,11 +415,11 @@ var hasRequiredTunnel$1;
 function requireTunnel$1 () {
 	if (hasRequiredTunnel$1) return tunnel$1;
 	hasRequiredTunnel$1 = 1;
-	var tls = require$$1$1;
+	var tls = require$$1;
 	var http = require$$2;
 	var https = require$$3;
 	var events = require$$4;
-	var util = require$$0$2;
+	var util = require$$0$3;
 
 
 	tunnel$1.httpOverHttp = httpOverHttp;
@@ -1132,14 +1133,14 @@ function requireUtil$6 () {
 	if (hasRequiredUtil$6) return util$6;
 	hasRequiredUtil$6 = 1;
 
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 	const { kDestroyed, kBodyUsed } = requireSymbols$4();
 	const { IncomingMessage } = require$$2;
-	const stream = require$$0$5;
-	const net = require$$0$4;
+	const stream = require$$0$6;
+	const net = require$$0$5;
 	const { InvalidArgumentError } = requireErrors();
 	const { Blob } = require$$7;
-	const nodeUtil = require$$0$2;
+	const nodeUtil = require$$0$3;
 	const { stringify } = require$$8;
 	const { headerNameLowerCasedRecord } = requireConstants$4();
 
@@ -1795,8 +1796,8 @@ function requireSbmh () {
 	 * Based heavily on the Streaming Boyer-Moore-Horspool C++ implementation
 	 * by Hongli Lai at: https://github.com/FooBarWidget/boyer-moore-horspool
 	 */
-	const EventEmitter = require$$0$6.EventEmitter;
-	const inherits = require$$1$2.inherits;
+	const EventEmitter = require$$0$7.EventEmitter;
+	const inherits = require$$1$1.inherits;
 
 	function SBMH (needle) {
 	  if (typeof needle === 'string') {
@@ -2005,8 +2006,8 @@ function requirePartStream () {
 	if (hasRequiredPartStream) return PartStream_1;
 	hasRequiredPartStream = 1;
 
-	const inherits = require$$1$2.inherits;
-	const ReadableStream = require$$0$7.Readable;
+	const inherits = require$$1$1.inherits;
+	const ReadableStream = require$$0$8.Readable;
 
 	function PartStream (opts) {
 	  ReadableStream.call(this, opts);
@@ -2050,8 +2051,8 @@ function requireHeaderParser () {
 	if (hasRequiredHeaderParser) return HeaderParser_1;
 	hasRequiredHeaderParser = 1;
 
-	const EventEmitter = require$$0$6.EventEmitter;
-	const inherits = require$$1$2.inherits;
+	const EventEmitter = require$$0$7.EventEmitter;
+	const inherits = require$$1$1.inherits;
 	const getLimit = requireGetLimit();
 
 	const StreamSearch = requireSbmh();
@@ -2158,8 +2159,8 @@ function requireDicer () {
 	if (hasRequiredDicer) return Dicer_1;
 	hasRequiredDicer = 1;
 
-	const WritableStream = require$$0$7.Writable;
-	const inherits = require$$1$2.inherits;
+	const WritableStream = require$$0$8.Writable;
+	const inherits = require$$1$1.inherits;
 
 	const StreamSearch = requireSbmh();
 
@@ -2735,8 +2736,8 @@ function requireMultipart () {
 	//  * support limits.fieldNameSize
 	//     -- this will require modifications to utils.parseParams
 
-	const { Readable } = require$$0$7;
-	const { inherits } = require$$1$2;
+	const { Readable } = require$$0$8;
+	const { inherits } = require$$1$1;
 
 	const Dicer = requireDicer();
 
@@ -3301,8 +3302,8 @@ function requireMain () {
 	if (hasRequiredMain) return main.exports;
 	hasRequiredMain = 1;
 
-	const WritableStream = require$$0$7.Writable;
-	const { inherits } = require$$1$2;
+	const WritableStream = require$$0$8.Writable;
+	const { inherits } = require$$1$1;
 	const Dicer = requireDicer();
 
 	const MultipartParser = requireMultipart();
@@ -3394,7 +3395,7 @@ function requireConstants$3 () {
 	if (hasRequiredConstants$3) return constants$3;
 	hasRequiredConstants$3 = 1;
 
-	const { MessageChannel, receiveMessageOnPort } = require$$0$8;
+	const { MessageChannel, receiveMessageOnPort } = require$$0$9;
 
 	const corsSafeListedMethods = ['GET', 'HEAD', 'POST'];
 	const corsSafeListedMethodsSet = new Set(corsSafeListedMethods);
@@ -3605,7 +3606,7 @@ function requireUtil$5 () {
 	const { getGlobalOrigin } = requireGlobal$1();
 	const { performance } = require$$2$1;
 	const { isBlobLike, toUSVString, ReadableStreamFrom } = requireUtil$6();
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 	const { isUint8Array } = require$$5;
 
 	let supportedHashes = [];
@@ -4770,7 +4771,7 @@ function requireWebidl () {
 	if (hasRequiredWebidl) return webidl_1;
 	hasRequiredWebidl = 1;
 
-	const { types } = require$$0$2;
+	const { types } = require$$0$3;
 	const { hasOwn, toUSVString } = requireUtil$5();
 
 	/** @type {import('../../types/webidl').Webidl} */
@@ -5423,7 +5424,7 @@ var hasRequiredDataURL;
 function requireDataURL () {
 	if (hasRequiredDataURL) return dataURL;
 	hasRequiredDataURL = 1;
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 	const { atob } = require$$7;
 	const { isomorphicDecode } = requireUtil$5();
 
@@ -6061,7 +6062,7 @@ function requireFile () {
 	hasRequiredFile = 1;
 
 	const { Blob, File: NativeFile } = require$$7;
-	const { types } = require$$0$2;
+	const { types } = require$$0$3;
 	const { kState } = requireSymbols$3();
 	const { isBlobLike } = requireUtil$5();
 	const { webidl } = requireWebidl();
@@ -6701,7 +6702,7 @@ function requireBody () {
 	const { DOMException, structuredClone } = requireConstants$3();
 	const { Blob, File: NativeFile } = require$$7;
 	const { kBodyUsed } = requireSymbols$4();
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 	const { isErrored } = requireUtil$6();
 	const { isUint8Array, isArrayBuffer } = require$$5;
 	const { File: UndiciFile } = requireFile();
@@ -7310,7 +7311,7 @@ function requireRequest$1 () {
 	  InvalidArgumentError,
 	  NotSupportedError
 	} = requireErrors();
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 	const { kHTTP2BuildRequest, kHTTP2CopyHeaders, kHTTP1BuildRequest } = requireSymbols$4();
 	const util = requireUtil$6();
 
@@ -8040,8 +8041,8 @@ function requireConnect () {
 	if (hasRequiredConnect) return connect;
 	hasRequiredConnect = 1;
 
-	const net = require$$0$4;
-	const assert = require$$0$3;
+	const net = require$$0$5;
+	const assert = require$$0$4;
 	const util = requireUtil$6();
 	const { InvalidArgumentError, ConnectTimeoutError } = requireErrors();
 
@@ -8126,7 +8127,7 @@ function requireConnect () {
 	    let socket;
 	    if (protocol === 'https:') {
 	      if (!tls) {
-	        tls = require$$1$1;
+	        tls = require$$1;
 	      }
 	      servername = servername || options.servername || util.getServerName(host) || null;
 
@@ -8232,15 +8233,15 @@ function requireConnect () {
 
 var constants$2 = {};
 
-var utils = {};
+var utils$1 = {};
 
-var hasRequiredUtils;
+var hasRequiredUtils$1;
 
-function requireUtils () {
-	if (hasRequiredUtils) return utils;
-	hasRequiredUtils = 1;
-	Object.defineProperty(utils, "__esModule", { value: true });
-	utils.enumToMap = void 0;
+function requireUtils$1 () {
+	if (hasRequiredUtils$1) return utils$1;
+	hasRequiredUtils$1 = 1;
+	Object.defineProperty(utils$1, "__esModule", { value: true });
+	utils$1.enumToMap = void 0;
 	function enumToMap(obj) {
 	    const res = {};
 	    Object.keys(obj).forEach((key) => {
@@ -8251,9 +8252,9 @@ function requireUtils () {
 	    });
 	    return res;
 	}
-	utils.enumToMap = enumToMap;
+	utils$1.enumToMap = enumToMap;
 	
-	return utils;
+	return utils$1;
 }
 
 var hasRequiredConstants$2;
@@ -8264,7 +8265,7 @@ function requireConstants$2 () {
 	(function (exports$1) {
 		Object.defineProperty(exports$1, "__esModule", { value: true });
 		exports$1.SPECIAL_HEADERS = exports$1.HEADER_STATE = exports$1.MINOR = exports$1.MAJOR = exports$1.CONNECTION_TOKEN_CHARS = exports$1.HEADER_CHARS = exports$1.TOKEN = exports$1.STRICT_TOKEN = exports$1.HEX = exports$1.URL_CHAR = exports$1.STRICT_URL_CHAR = exports$1.USERINFO_CHARS = exports$1.MARK = exports$1.ALPHANUM = exports$1.NUM = exports$1.HEX_MAP = exports$1.NUM_MAP = exports$1.ALPHA = exports$1.FINISH = exports$1.H_METHOD_MAP = exports$1.METHOD_MAP = exports$1.METHODS_RTSP = exports$1.METHODS_ICE = exports$1.METHODS_HTTP = exports$1.METHODS = exports$1.LENIENT_FLAGS = exports$1.FLAGS = exports$1.TYPE = exports$1.ERROR = void 0;
-		const utils_1 = requireUtils();
+		const utils_1 = requireUtils$1();
 		(function (ERROR) {
 		    ERROR[ERROR["OK"] = 0] = "OK";
 		    ERROR[ERROR["INTERNAL"] = 1] = "INTERNAL";
@@ -8546,7 +8547,7 @@ function requireRedirectHandler () {
 
 	const util = requireUtil$6();
 	const { kBodyUsed } = requireSymbols$4();
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 	const { InvalidArgumentError } = requireErrors();
 	const EE = require$$4;
 
@@ -8806,10 +8807,10 @@ function requireClient () {
 
 	/* global WebAssembly */
 
-	const assert = require$$0$3;
-	const net = require$$0$4;
+	const assert = require$$0$4;
+	const net = require$$0$5;
 	const http = require$$2;
-	const { pipeline } = require$$0$5;
+	const { pipeline } = require$$0$6;
 	const util = requireUtil$6();
 	const timers = requireTimers();
 	const Request = requireRequest$1();
@@ -11991,8 +11992,8 @@ function requireReadable () {
 	if (hasRequiredReadable) return readable;
 	hasRequiredReadable = 1;
 
-	const assert = require$$0$3;
-	const { Readable } = require$$0$5;
+	const assert = require$$0$4;
+	const { Readable } = require$$0$6;
 	const { RequestAbortedError, NotSupportedError, InvalidArgumentError } = requireErrors();
 	const util = requireUtil$6();
 	const { ReadableStreamFrom, toUSVString } = requireUtil$6();
@@ -12318,7 +12319,7 @@ var hasRequiredUtil$4;
 function requireUtil$4 () {
 	if (hasRequiredUtil$4) return util$4;
 	hasRequiredUtil$4 = 1;
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 	const {
 	  ResponseStatusCodeError
 	} = requireErrors();
@@ -12624,7 +12625,7 @@ function requireApiStream () {
 	if (hasRequiredApiStream) return apiStream;
 	hasRequiredApiStream = 1;
 
-	const { finished, PassThrough } = require$$0$5;
+	const { finished, PassThrough } = require$$0$6;
 	const {
 	  InvalidArgumentError,
 	  InvalidReturnValueError,
@@ -12856,7 +12857,7 @@ function requireApiPipeline () {
 	  Readable,
 	  Duplex,
 	  PassThrough
-	} = require$$0$5;
+	} = require$$0$6;
 	const {
 	  InvalidArgumentError,
 	  InvalidReturnValueError,
@@ -12865,7 +12866,7 @@ function requireApiPipeline () {
 	const util = requireUtil$6();
 	const { AsyncResource } = require$$4$1;
 	const { addSignal, removeSignal } = requireAbortSignal();
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 
 	const kResume = Symbol('resume');
 
@@ -13113,7 +13114,7 @@ function requireApiUpgrade () {
 	const { AsyncResource } = require$$4$1;
 	const util = requireUtil$6();
 	const { addSignal, removeSignal } = requireAbortSignal();
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 
 	class UpgradeHandler extends AsyncResource {
 	  constructor (opts, callback) {
@@ -13418,7 +13419,7 @@ function requireMockUtils () {
 	  types: {
 	    isPromise
 	  }
-	} = require$$0$2;
+	} = require$$0$3;
 
 	function matchValue (match, value) {
 	  if (typeof match === 'string') {
@@ -13978,7 +13979,7 @@ function requireMockClient () {
 	if (hasRequiredMockClient) return mockClient;
 	hasRequiredMockClient = 1;
 
-	const { promisify } = require$$0$2;
+	const { promisify } = require$$0$3;
 	const Client = requireClient();
 	const { buildMockDispatch } = requireMockUtils();
 	const {
@@ -14045,7 +14046,7 @@ function requireMockPool () {
 	if (hasRequiredMockPool) return mockPool;
 	hasRequiredMockPool = 1;
 
-	const { promisify } = require$$0$2;
+	const { promisify } = require$$0$3;
 	const Pool = requirePool();
 	const { buildMockDispatch } = requireMockUtils();
 	const {
@@ -14149,8 +14150,8 @@ function requirePendingInterceptorsFormatter () {
 	if (hasRequiredPendingInterceptorsFormatter) return pendingInterceptorsFormatter;
 	hasRequiredPendingInterceptorsFormatter = 1;
 
-	const { Transform } = require$$0$5;
-	const { Console } = require$$1$3;
+	const { Transform } = require$$0$6;
+	const { Console } = require$$1$2;
 
 	/**
 	 * Gets the output of `console.table(…)` as a string.
@@ -14377,7 +14378,7 @@ function requireProxyAgent () {
 	hasRequiredProxyAgent = 1;
 
 	const { kProxy, kClose, kDestroy, kInterceptors } = requireSymbols$4();
-	const { URL } = require$$1$4;
+	const { URL } = require$$1$3;
 	const Agent = requireAgent();
 	const Pool = requirePool();
 	const DispatcherBase = requireDispatcherBase();
@@ -14572,7 +14573,7 @@ var hasRequiredRetryHandler;
 function requireRetryHandler () {
 	if (hasRequiredRetryHandler) return RetryHandler_1;
 	hasRequiredRetryHandler = 1;
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 
 	const { kRetryHandlerDefaultRetry } = requireSymbols$4();
 	const { RequestRetryError } = requireErrors();
@@ -15009,9 +15010,9 @@ function requireHeaders () {
 	  isValidHeaderName,
 	  isValidHeaderValue
 	} = requireUtil$5();
-	const util = require$$0$2;
+	const util = require$$0$3;
 	const { webidl } = requireWebidl();
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 
 	const kHeadersMap = Symbol('headers map');
 	const kHeadersSortedMap = Symbol('headers map sorted');
@@ -15617,8 +15618,8 @@ function requireResponse () {
 	const { getGlobalOrigin } = requireGlobal$1();
 	const { URLSerializer } = requireDataURL();
 	const { kHeadersList, kConstruct } = requireSymbols$4();
-	const assert = require$$0$3;
-	const { types } = require$$0$2;
+	const assert = require$$0$4;
+	const { types } = require$$0$3;
 
 	const ReadableStream = globalThis.ReadableStream || require$$14.ReadableStream;
 	const textEncoder = new TextEncoder('utf-8');
@@ -16201,7 +16202,7 @@ function requireRequest () {
 	const { getGlobalOrigin } = requireGlobal$1();
 	const { URLSerializer } = requireDataURL();
 	const { kHeadersList, kConstruct } = requireSymbols$4();
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 	const { getMaxListeners, setMaxListeners, getEventListeners, defaultMaxListeners } = require$$4;
 
 	let TransformStream = globalThis.TransformStream;
@@ -17167,7 +17168,7 @@ function requireFetch () {
 	  urlHasHttpsScheme
 	} = requireUtil$5();
 	const { kState, kHeaders, kGuard, kRealm } = requireSymbols$3();
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 	const { safelyExtractBody } = requireBody();
 	const {
 	  redirectStatusSet,
@@ -17179,7 +17180,7 @@ function requireFetch () {
 	} = requireConstants$3();
 	const { kHeadersList } = requireSymbols$4();
 	const EE = require$$4;
-	const { Readable, pipeline } = require$$0$5;
+	const { Readable, pipeline } = require$$0$6;
 	const { addAbortListener, isErrored, isReadable, nodeMajor, nodeMinor } = requireUtil$6();
 	const { dataURLProcessor, serializeAMimeType } = requireDataURL();
 	const { TransformStream } = require$$14;
@@ -19619,7 +19620,7 @@ function requireUtil$3 () {
 	const { getEncoding } = requireEncoding();
 	const { DOMException } = requireConstants$3();
 	const { serializeAMimeType, parseMIMEType } = requireDataURL();
-	const { types } = require$$0$2;
+	const { types } = require$$0$3;
 	const { StringDecoder } = require$$6;
 	const { btoa } = require$$7;
 
@@ -20373,7 +20374,7 @@ function requireUtil$2 () {
 	if (hasRequiredUtil$2) return util$2;
 	hasRequiredUtil$2 = 1;
 
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 	const { URLSerializer } = requireDataURL();
 	const { isValidHeaderName } = requireUtil$5();
 
@@ -20440,7 +20441,7 @@ function requireCache () {
 	const { kState, kHeaders, kGuard, kRealm } = requireSymbols$3();
 	const { fetching } = requireFetch();
 	const { urlIsHttpHttpsScheme, createDeferredPromise, readAllBytes } = requireUtil$5();
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 	const { getGlobalDispatcher } = requireGlobal();
 
 	/**
@@ -21733,7 +21734,7 @@ function requireParse () {
 	const { maxNameValuePairSize, maxAttributeValueSize } = requireConstants$1();
 	const { isCTLExcludingHtab } = requireUtil$1();
 	const { collectASequenceOfCodePointsFast } = requireDataURL();
-	const assert = require$$0$3;
+	const assert = require$$0$4;
 
 	/**
 	 * @description Parses the field-value attributes of a set-cookie header string.
@@ -22327,7 +22328,7 @@ function requireEvents () {
 
 	const { webidl } = requireWebidl();
 	const { kEnumerableProperty } = requireUtil$6();
-	const { MessagePort } = require$$0$8;
+	const { MessagePort } = require$$0$9;
 
 	/**
 	 * @see https://html.spec.whatwg.org/multipage/comms.html#messageevent
@@ -22844,7 +22845,7 @@ function requireConnection () {
 	if (hasRequiredConnection) return connection;
 	hasRequiredConnection = 1;
 
-	const diagnosticsChannel = require$$0$9;
+	const diagnosticsChannel = require$$0$a;
 	const { uid, states } = requireConstants();
 	const {
 	  kReadyState,
@@ -23224,8 +23225,8 @@ function requireReceiver () {
 	if (hasRequiredReceiver) return receiver;
 	hasRequiredReceiver = 1;
 
-	const { Writable } = require$$0$5;
-	const diagnosticsChannel = require$$0$9;
+	const { Writable } = require$$0$6;
+	const diagnosticsChannel = require$$0$a;
 	const { parserStates, opcodes, states, emptyBuffer } = requireConstants();
 	const { kReadyState, kSentClose, kResponse, kReceivedClose } = requireSymbols();
 	const { isValidStatusCode, failWebsocketConnection, websocketMessageReceived } = requireUtil();
@@ -23596,7 +23597,7 @@ function requireWebsocket () {
 	const { ByteParser } = requireReceiver();
 	const { kEnumerableProperty, isBlobLike } = requireUtil$6();
 	const { getGlobalDispatcher } = requireGlobal();
-	const { types } = require$$0$2;
+	const { types } = require$$0$3;
 
 	let experimentalWarned = false;
 
@@ -24389,13 +24390,13 @@ function requireUndici () {
 	return undici;
 }
 
-var hasRequiredLib;
+var hasRequiredLib$1;
 
-function requireLib () {
-	if (hasRequiredLib) return lib;
-	hasRequiredLib = 1;
+function requireLib$1 () {
+	if (hasRequiredLib$1) return lib$1;
+	hasRequiredLib$1 = 1;
 	/* eslint-disable @typescript-eslint/no-explicit-any */
-	var __createBinding = (lib && lib.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+	var __createBinding = (lib$1 && lib$1.__createBinding) || (Object.create ? (function(o, m, k, k2) {
 	    if (k2 === undefined) k2 = k;
 	    var desc = Object.getOwnPropertyDescriptor(m, k);
 	    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -24406,12 +24407,12 @@ function requireLib () {
 	    if (k2 === undefined) k2 = k;
 	    o[k2] = m[k];
 	}));
-	var __setModuleDefault = (lib && lib.__setModuleDefault) || (Object.create ? (function(o, v) {
+	var __setModuleDefault = (lib$1 && lib$1.__setModuleDefault) || (Object.create ? (function(o, v) {
 	    Object.defineProperty(o, "default", { enumerable: true, value: v });
 	}) : function(o, v) {
 	    o["default"] = v;
 	});
-	var __importStar = (lib && lib.__importStar) || (function () {
+	var __importStar = (lib$1 && lib$1.__importStar) || (function () {
 	    var ownKeys = function(o) {
 	        ownKeys = Object.getOwnPropertyNames || function (o) {
 	            var ar = [];
@@ -24428,7 +24429,7 @@ function requireLib () {
 	        return result;
 	    };
 	})();
-	var __awaiter = (lib && lib.__awaiter) || function (thisArg, _arguments, P, generator) {
+	var __awaiter = (lib$1 && lib$1.__awaiter) || function (thisArg, _arguments, P, generator) {
 	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
 	    return new (P || (P = Promise))(function (resolve, reject) {
 	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -24437,10 +24438,10 @@ function requireLib () {
 	        step((generator = generator.apply(thisArg, _arguments || [])).next());
 	    });
 	};
-	Object.defineProperty(lib, "__esModule", { value: true });
-	lib.HttpClient = lib.HttpClientResponse = lib.HttpClientError = lib.MediaTypes = lib.Headers = lib.HttpCodes = void 0;
-	lib.getProxyUrl = getProxyUrl;
-	lib.isHttps = isHttps;
+	Object.defineProperty(lib$1, "__esModule", { value: true });
+	lib$1.HttpClient = lib$1.HttpClientResponse = lib$1.HttpClientError = lib$1.MediaTypes = lib$1.Headers = lib$1.HttpCodes = void 0;
+	lib$1.getProxyUrl = getProxyUrl;
+	lib$1.isHttps = isHttps;
 	const http = __importStar(require$$2);
 	const https = __importStar(require$$3);
 	const pm = __importStar(requireProxy());
@@ -24475,16 +24476,16 @@ function requireLib () {
 	    HttpCodes[HttpCodes["BadGateway"] = 502] = "BadGateway";
 	    HttpCodes[HttpCodes["ServiceUnavailable"] = 503] = "ServiceUnavailable";
 	    HttpCodes[HttpCodes["GatewayTimeout"] = 504] = "GatewayTimeout";
-	})(HttpCodes || (lib.HttpCodes = HttpCodes = {}));
+	})(HttpCodes || (lib$1.HttpCodes = HttpCodes = {}));
 	var Headers;
 	(function (Headers) {
 	    Headers["Accept"] = "accept";
 	    Headers["ContentType"] = "content-type";
-	})(Headers || (lib.Headers = Headers = {}));
+	})(Headers || (lib$1.Headers = Headers = {}));
 	var MediaTypes;
 	(function (MediaTypes) {
 	    MediaTypes["ApplicationJson"] = "application/json";
-	})(MediaTypes || (lib.MediaTypes = MediaTypes = {}));
+	})(MediaTypes || (lib$1.MediaTypes = MediaTypes = {}));
 	/**
 	 * Returns the proxy URL, depending upon the supplied url and proxy environment variables.
 	 * @param serverUrl  The server URL where the request will be sent. For example, https://api.github.com
@@ -24516,7 +24517,7 @@ function requireLib () {
 	        Object.setPrototypeOf(this, HttpClientError.prototype);
 	    }
 	}
-	lib.HttpClientError = HttpClientError;
+	lib$1.HttpClientError = HttpClientError;
 	class HttpClientResponse {
 	    constructor(message) {
 	        this.message = message;
@@ -24548,7 +24549,7 @@ function requireLib () {
 	        });
 	    }
 	}
-	lib.HttpClientResponse = HttpClientResponse;
+	lib$1.HttpClientResponse = HttpClientResponse;
 	function isHttps(requestUrl) {
 	    const parsedUrl = new URL(requestUrl);
 	    return parsedUrl.protocol === 'https:';
@@ -25127,10 +25128,10 @@ function requireLib () {
 	        });
 	    }
 	}
-	lib.HttpClient = HttpClient;
+	lib$1.HttpClient = HttpClient;
 	const lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => ((c[k.toLowerCase()] = obj[k]), c), {});
 	
-	return lib;
+	return lib$1;
 }
 
 var auth = {};
@@ -25239,7 +25240,7 @@ function requireOidcUtils () {
 	};
 	Object.defineProperty(oidcUtils, "__esModule", { value: true });
 	oidcUtils.OidcClient = void 0;
-	const http_client_1 = requireLib();
+	const http_client_1 = requireLib$1();
 	const auth_1 = requireAuth();
 	const core_1 = requireCore();
 	class OidcClient {
@@ -25327,7 +25328,7 @@ function requireSummary () {
 		Object.defineProperty(exports$1, "__esModule", { value: true });
 		exports$1.summary = exports$1.markdownSummary = exports$1.SUMMARY_DOCS_URL = exports$1.SUMMARY_ENV_VAR = void 0;
 		const os_1 = require$$0__default;
-		const fs_1 = require$$1__default;
+		const fs_1 = require$$0__default$1;
 		const { access, appendFile, writeFile } = fs_1.promises;
 		exports$1.SUMMARY_ENV_VAR = 'GITHUB_STEP_SUMMARY';
 		exports$1.SUMMARY_DOCS_URL = 'https://docs.github.com/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary';
@@ -25748,7 +25749,7 @@ function requireIoUtil () {
 		exports$1.isRooted = isRooted;
 		exports$1.tryGetExecutablePath = tryGetExecutablePath;
 		exports$1.getCmdPath = getCmdPath;
-		const fs = __importStar(require$$1__default);
+		const fs = __importStar(require$$0__default$1);
 		const path = __importStar(path__default);
 		_a = fs.promises
 		// export const {open} = 'fs'
@@ -25978,7 +25979,7 @@ function requireIo () {
 	io.mkdirP = mkdirP;
 	io.which = which;
 	io.findInPath = findInPath;
-	const assert_1 = require$$0$3;
+	const assert_1 = require$$0$4;
 	const path = __importStar(path__default);
 	const ioUtil = __importStar(requireIoUtil());
 	/**
@@ -26295,7 +26296,7 @@ function requireToolrunner () {
 	toolrunner.argStringToArray = argStringToArray;
 	const os = __importStar(require$$0__default);
 	const events = __importStar(require$$4);
-	const child = __importStar(require$$2$2);
+	const child = __importStar(require$$3$2);
 	const path = __importStar(path__default);
 	const io = __importStar(requireIo());
 	const ioUtil = __importStar(requireIoUtil());
@@ -27184,7 +27185,7 @@ function requireCore () {
 		exports$1.getIDToken = getIDToken;
 		const command_1 = requireCommand();
 		const file_command_1 = requireFileCommand();
-		const utils_1 = requireUtils$1();
+		const utils_1 = requireUtils$2();
 		const os = __importStar(require$$0__default);
 		const path = __importStar(path__default);
 		const oidc_utils_1 = requireOidcUtils();
@@ -29221,8 +29222,8 @@ function requireManifest () {
 		// needs to be require for core node modules to be mocked
 		/* eslint @typescript-eslint/no-require-imports: 0 */
 		const os = require$$0__default;
-		const cp = require$$2$2;
-		const fs = require$$1__default;
+		const cp = require$$3$2;
+		const fs = require$$0__default$1;
 		function _findMatch(versionSpec, stable, candidates, archFilter) {
 		    return __awaiter(this, void 0, void 0, function* () {
 		        const platFilter = os.platform();
@@ -29481,16 +29482,16 @@ function requireToolCache () {
 	toolCache.evaluateVersions = evaluateVersions;
 	const core = __importStar(requireCore());
 	const io = __importStar(requireIo());
-	const crypto = __importStar(require$$0$1);
-	const fs = __importStar(require$$1__default);
+	const crypto = __importStar(require$$0$2);
+	const fs = __importStar(require$$0__default$1);
 	const mm = __importStar(requireManifest());
 	const os = __importStar(require$$0__default);
 	const path = __importStar(path__default);
-	const httpm = __importStar(requireLib());
+	const httpm = __importStar(requireLib$1());
 	const semver = __importStar(requireSemver());
-	const stream = __importStar(require$$0$5);
-	const util = __importStar(require$$0$2);
-	const assert_1 = require$$0$3;
+	const stream = __importStar(require$$0$6);
+	const util = __importStar(require$$0$3);
+	const assert_1 = require$$0$4;
 	const exec_1 = requireExec();
 	const retry_helper_1 = requireRetryHelper();
 	class HTTPError extends Error {
@@ -30104,6 +30105,1418 @@ var toolCacheExports = requireToolCache();
 
 var ioExports = requireIo();
 
+var lib = {};
+
+function commonjsRequire(path) {
+	throw new Error('Could not dynamically require "' + path + '". Please configure the dynamicRequireTargets or/and ignoreDynamicRequires option of @rollup/plugin-commonjs appropriately for this require call to work.');
+}
+
+var utils = {};
+
+var hasRequiredUtils;
+
+function requireUtils () {
+	if (hasRequiredUtils) return utils;
+	hasRequiredUtils = 1;
+	/**
+	 * Copyright (c) 2017, Daniel Imms (MIT License).
+	 * Copyright (c) 2018, Microsoft Corporation (MIT License).
+	 */
+	Object.defineProperty(utils, "__esModule", { value: true });
+	utils.loadNativeModule = utils.assign = void 0;
+	function assign(target) {
+	    var sources = [];
+	    for (var _i = 1; _i < arguments.length; _i++) {
+	        sources[_i - 1] = arguments[_i];
+	    }
+	    sources.forEach(function (source) { return Object.keys(source).forEach(function (key) { return target[key] = source[key]; }); });
+	    return target;
+	}
+	utils.assign = assign;
+	function loadNativeModule(name) {
+	    // Check build, debug, and then prebuilds.
+	    var dirs = ['build/Release', 'build/Debug', "prebuilds/" + process.platform + "-" + process.arch];
+	    // Check relative to the parent dir for unbundled and then the current dir for bundled
+	    var relative = ['..', '.'];
+	    var lastError;
+	    for (var _i = 0, dirs_1 = dirs; _i < dirs_1.length; _i++) {
+	        var d = dirs_1[_i];
+	        for (var _a = 0, relative_1 = relative; _a < relative_1.length; _a++) {
+	            var r = relative_1[_a];
+	            var dir = r + "/" + d + "/";
+	            try {
+	                return { dir: dir, module: commonjsRequire(dir + "/" + name + ".node") };
+	            }
+	            catch (e) {
+	                lastError = e;
+	            }
+	        }
+	    }
+	    throw new Error("Failed to load native module: " + name + ".node, checked: " + dirs.join(', ') + ": " + lastError);
+	}
+	utils.loadNativeModule = loadNativeModule;
+	
+	return utils;
+}
+
+var windowsTerminal = {};
+
+var terminal = {};
+
+var eventEmitter2 = {};
+
+var hasRequiredEventEmitter2;
+
+function requireEventEmitter2 () {
+	if (hasRequiredEventEmitter2) return eventEmitter2;
+	hasRequiredEventEmitter2 = 1;
+	/**
+	 * Copyright (c) 2019, Microsoft Corporation (MIT License).
+	 */
+	Object.defineProperty(eventEmitter2, "__esModule", { value: true });
+	eventEmitter2.EventEmitter2 = void 0;
+	var EventEmitter2 = /** @class */ (function () {
+	    function EventEmitter2() {
+	        this._listeners = [];
+	    }
+	    Object.defineProperty(EventEmitter2.prototype, "event", {
+	        get: function () {
+	            var _this = this;
+	            if (!this._event) {
+	                this._event = function (listener) {
+	                    _this._listeners.push(listener);
+	                    var disposable = {
+	                        dispose: function () {
+	                            for (var i = 0; i < _this._listeners.length; i++) {
+	                                if (_this._listeners[i] === listener) {
+	                                    _this._listeners.splice(i, 1);
+	                                    return;
+	                                }
+	                            }
+	                        }
+	                    };
+	                    return disposable;
+	                };
+	            }
+	            return this._event;
+	        },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    EventEmitter2.prototype.fire = function (data) {
+	        var queue = [];
+	        for (var i = 0; i < this._listeners.length; i++) {
+	            queue.push(this._listeners[i]);
+	        }
+	        for (var i = 0; i < queue.length; i++) {
+	            queue[i].call(undefined, data);
+	        }
+	    };
+	    return EventEmitter2;
+	}());
+	eventEmitter2.EventEmitter2 = EventEmitter2;
+	
+	return eventEmitter2;
+}
+
+var hasRequiredTerminal;
+
+function requireTerminal () {
+	if (hasRequiredTerminal) return terminal;
+	hasRequiredTerminal = 1;
+	/**
+	 * Copyright (c) 2012-2015, Christopher Jeffrey (MIT License)
+	 * Copyright (c) 2016, Daniel Imms (MIT License).
+	 * Copyright (c) 2018, Microsoft Corporation (MIT License).
+	 */
+	Object.defineProperty(terminal, "__esModule", { value: true });
+	terminal.Terminal = terminal.DEFAULT_ROWS = terminal.DEFAULT_COLS = void 0;
+	var events_1 = require$$4;
+	var eventEmitter2_1 = requireEventEmitter2();
+	terminal.DEFAULT_COLS = 80;
+	terminal.DEFAULT_ROWS = 24;
+	/**
+	 * Default messages to indicate PAUSE/RESUME for automatic flow control.
+	 * To avoid conflicts with rebound XON/XOFF control codes (such as on-my-zsh),
+	 * the sequences can be customized in `IPtyForkOptions`.
+	 */
+	var FLOW_CONTROL_PAUSE = '\x13'; // defaults to XOFF
+	var FLOW_CONTROL_RESUME = '\x11'; // defaults to XON
+	var Terminal = /** @class */ (function () {
+	    function Terminal(opt) {
+	        this._pid = 0;
+	        this._fd = 0;
+	        this._cols = 0;
+	        this._rows = 0;
+	        this._readable = false;
+	        this._writable = false;
+	        this._onData = new eventEmitter2_1.EventEmitter2();
+	        this._onExit = new eventEmitter2_1.EventEmitter2();
+	        // for 'close'
+	        this._internalee = new events_1.EventEmitter();
+	        // setup flow control handling
+	        this.handleFlowControl = !!(opt === null || opt === void 0 ? void 0 : opt.handleFlowControl);
+	        this._flowControlPause = (opt === null || opt === void 0 ? void 0 : opt.flowControlPause) || FLOW_CONTROL_PAUSE;
+	        this._flowControlResume = (opt === null || opt === void 0 ? void 0 : opt.flowControlResume) || FLOW_CONTROL_RESUME;
+	        if (!opt) {
+	            return;
+	        }
+	        // Do basic type checks here in case node-pty is being used within JavaScript. If the wrong
+	        // types go through to the C++ side it can lead to hard to diagnose exceptions.
+	        this._checkType('name', opt.name ? opt.name : undefined, 'string');
+	        this._checkType('cols', opt.cols ? opt.cols : undefined, 'number');
+	        this._checkType('rows', opt.rows ? opt.rows : undefined, 'number');
+	        this._checkType('cwd', opt.cwd ? opt.cwd : undefined, 'string');
+	        this._checkType('env', opt.env ? opt.env : undefined, 'object');
+	        this._checkType('uid', opt.uid ? opt.uid : undefined, 'number');
+	        this._checkType('gid', opt.gid ? opt.gid : undefined, 'number');
+	        this._checkType('encoding', opt.encoding ? opt.encoding : undefined, 'string');
+	    }
+	    Object.defineProperty(Terminal.prototype, "onData", {
+	        get: function () { return this._onData.event; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Object.defineProperty(Terminal.prototype, "onExit", {
+	        get: function () { return this._onExit.event; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Object.defineProperty(Terminal.prototype, "pid", {
+	        get: function () { return this._pid; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Object.defineProperty(Terminal.prototype, "cols", {
+	        get: function () { return this._cols; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Object.defineProperty(Terminal.prototype, "rows", {
+	        get: function () { return this._rows; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Terminal.prototype.write = function (data) {
+	        if (this.handleFlowControl) {
+	            // PAUSE/RESUME messages are not forwarded to the pty
+	            if (data === this._flowControlPause) {
+	                this.pause();
+	                return;
+	            }
+	            if (data === this._flowControlResume) {
+	                this.resume();
+	                return;
+	            }
+	        }
+	        // everything else goes to the real pty
+	        this._write(data);
+	    };
+	    Terminal.prototype._forwardEvents = function () {
+	        var _this = this;
+	        this.on('data', function (e) { return _this._onData.fire(e); });
+	        this.on('exit', function (exitCode, signal) { return _this._onExit.fire({ exitCode: exitCode, signal: signal }); });
+	    };
+	    Terminal.prototype._checkType = function (name, value, type, allowArray) {
+	        if (allowArray === void 0) { allowArray = false; }
+	        if (value === undefined) {
+	            return;
+	        }
+	        if (allowArray) {
+	            if (Array.isArray(value)) {
+	                value.forEach(function (v, i) {
+	                    if (typeof v !== type) {
+	                        throw new Error(name + "[" + i + "] must be a " + type + " (not a " + typeof v[i] + ")");
+	                    }
+	                });
+	                return;
+	            }
+	        }
+	        if (typeof value !== type) {
+	            throw new Error(name + " must be a " + type + " (not a " + typeof value + ")");
+	        }
+	    };
+	    /** See net.Socket.end */
+	    Terminal.prototype.end = function (data) {
+	        this._socket.end(data);
+	    };
+	    /** See stream.Readable.pipe */
+	    Terminal.prototype.pipe = function (dest, options) {
+	        return this._socket.pipe(dest, options);
+	    };
+	    /** See net.Socket.pause */
+	    Terminal.prototype.pause = function () {
+	        return this._socket.pause();
+	    };
+	    /** See net.Socket.resume */
+	    Terminal.prototype.resume = function () {
+	        return this._socket.resume();
+	    };
+	    /** See net.Socket.setEncoding */
+	    Terminal.prototype.setEncoding = function (encoding) {
+	        if (this._socket._decoder) {
+	            delete this._socket._decoder;
+	        }
+	        if (encoding) {
+	            this._socket.setEncoding(encoding);
+	        }
+	    };
+	    Terminal.prototype.addListener = function (eventName, listener) { this.on(eventName, listener); };
+	    Terminal.prototype.on = function (eventName, listener) {
+	        if (eventName === 'close') {
+	            this._internalee.on('close', listener);
+	            return;
+	        }
+	        this._socket.on(eventName, listener);
+	    };
+	    Terminal.prototype.emit = function (eventName) {
+	        if (eventName === 'close') {
+	            return this._internalee.emit.apply(this._internalee, arguments);
+	        }
+	        return this._socket.emit.apply(this._socket, arguments);
+	    };
+	    Terminal.prototype.listeners = function (eventName) {
+	        return this._socket.listeners(eventName);
+	    };
+	    Terminal.prototype.removeListener = function (eventName, listener) {
+	        this._socket.removeListener(eventName, listener);
+	    };
+	    Terminal.prototype.removeAllListeners = function (eventName) {
+	        this._socket.removeAllListeners(eventName);
+	    };
+	    Terminal.prototype.once = function (eventName, listener) {
+	        this._socket.once(eventName, listener);
+	    };
+	    Terminal.prototype._close = function () {
+	        this._socket.readable = false;
+	        this.write = function () { };
+	        this.end = function () { };
+	        this._writable = false;
+	        this._readable = false;
+	    };
+	    Terminal.prototype._parseEnv = function (env) {
+	        var keys = Object.keys(env || {});
+	        var pairs = [];
+	        for (var i = 0; i < keys.length; i++) {
+	            if (keys[i] === undefined) {
+	                continue;
+	            }
+	            pairs.push(keys[i] + '=' + env[keys[i]]);
+	        }
+	        return pairs;
+	    };
+	    return Terminal;
+	}());
+	terminal.Terminal = Terminal;
+	
+	return terminal;
+}
+
+var windowsPtyAgent = {};
+
+var windowsConoutConnection = {};
+
+var conout = {};
+
+var hasRequiredConout;
+
+function requireConout () {
+	if (hasRequiredConout) return conout;
+	hasRequiredConout = 1;
+	/**
+	 * Copyright (c) 2020, Microsoft Corporation (MIT License).
+	 */
+	Object.defineProperty(conout, "__esModule", { value: true });
+	conout.getWorkerPipeName = void 0;
+	function getWorkerPipeName(conoutPipeName) {
+	    return conoutPipeName + "-worker";
+	}
+	conout.getWorkerPipeName = getWorkerPipeName;
+	
+	return conout;
+}
+
+var hasRequiredWindowsConoutConnection;
+
+function requireWindowsConoutConnection () {
+	if (hasRequiredWindowsConoutConnection) return windowsConoutConnection;
+	hasRequiredWindowsConoutConnection = 1;
+	/**
+	 * Copyright (c) 2020, Microsoft Corporation (MIT License).
+	 */
+	var __awaiter = (windowsConoutConnection && windowsConoutConnection.__awaiter) || function (thisArg, _arguments, P, generator) {
+	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+	        step((generator = generator.apply(thisArg, _arguments || [])).next());
+	    });
+	};
+	var __generator = (windowsConoutConnection && windowsConoutConnection.__generator) || function (thisArg, body) {
+	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+	    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+	    function verb(n) { return function (v) { return step([n, v]); }; }
+	    function step(op) {
+	        if (f) throw new TypeError("Generator is already executing.");
+	        while (_) try {
+	            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+	            if (y = 0, t) op = [op[0] & 2, t.value];
+	            switch (op[0]) {
+	                case 0: case 1: t = op; break;
+	                case 4: _.label++; return { value: op[1], done: false };
+	                case 5: _.label++; y = op[1]; op = [0]; continue;
+	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+	                default:
+	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+	                    if (t[2]) _.ops.pop();
+	                    _.trys.pop(); continue;
+	            }
+	            op = body.call(thisArg, _);
+	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+	    }
+	};
+	Object.defineProperty(windowsConoutConnection, "__esModule", { value: true });
+	windowsConoutConnection.ConoutConnection = void 0;
+	var worker_threads_1 = require$$0$9;
+	var conout_1 = requireConout();
+	var path_1 = path__default;
+	var eventEmitter2_1 = requireEventEmitter2();
+	/**
+	 * The amount of time to wait for additional data after the conpty shell process has exited before
+	 * shutting down the worker and sockets. The timer will be reset if a new data event comes in after
+	 * the timer has started.
+	 */
+	var FLUSH_DATA_INTERVAL = 1000;
+	/**
+	 * Connects to and manages the lifecycle of the conout socket. This socket must be drained on
+	 * another thread in order to avoid deadlocks where Conpty waits for the out socket to drain
+	 * when `ClosePseudoConsole` is called. This happens when data is being written to the terminal when
+	 * the pty is closed.
+	 *
+	 * See also:
+	 * - https://github.com/microsoft/node-pty/issues/375
+	 * - https://github.com/microsoft/vscode/issues/76548
+	 * - https://github.com/microsoft/terminal/issues/1810
+	 * - https://docs.microsoft.com/en-us/windows/console/closepseudoconsole
+	 */
+	var ConoutConnection = /** @class */ (function () {
+	    function ConoutConnection(_conoutPipeName, _useConptyDll) {
+	        var _this = this;
+	        this._conoutPipeName = _conoutPipeName;
+	        this._useConptyDll = _useConptyDll;
+	        this._isDisposed = false;
+	        this._onReady = new eventEmitter2_1.EventEmitter2();
+	        var workerData = {
+	            conoutPipeName: _conoutPipeName
+	        };
+	        var scriptPath = __dirname.replace('node_modules.asar', 'node_modules.asar.unpacked');
+	        this._worker = new worker_threads_1.Worker(path_1.join(scriptPath, 'worker/conoutSocketWorker.js'), { workerData: workerData });
+	        this._worker.on('message', function (message) {
+	            switch (message) {
+	                case 1 /* READY */:
+	                    _this._onReady.fire();
+	                    return;
+	                default:
+	                    console.warn('Unexpected ConoutWorkerMessage', message);
+	            }
+	        });
+	    }
+	    Object.defineProperty(ConoutConnection.prototype, "onReady", {
+	        get: function () { return this._onReady.event; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    ConoutConnection.prototype.dispose = function () {
+	        if (!this._useConptyDll && this._isDisposed) {
+	            return;
+	        }
+	        this._isDisposed = true;
+	        // Drain all data from the socket before closing
+	        this._drainDataAndClose();
+	    };
+	    ConoutConnection.prototype.connectSocket = function (socket) {
+	        socket.connect(conout_1.getWorkerPipeName(this._conoutPipeName));
+	    };
+	    ConoutConnection.prototype._drainDataAndClose = function () {
+	        var _this = this;
+	        if (this._drainTimeout) {
+	            clearTimeout(this._drainTimeout);
+	        }
+	        this._drainTimeout = setTimeout(function () { return _this._destroySocket(); }, FLUSH_DATA_INTERVAL);
+	    };
+	    ConoutConnection.prototype._destroySocket = function () {
+	        return __awaiter(this, void 0, void 0, function () {
+	            return __generator(this, function (_a) {
+	                switch (_a.label) {
+	                    case 0: return [4 /*yield*/, this._worker.terminate()];
+	                    case 1:
+	                        _a.sent();
+	                        return [2 /*return*/];
+	                }
+	            });
+	        });
+	    };
+	    return ConoutConnection;
+	}());
+	windowsConoutConnection.ConoutConnection = ConoutConnection;
+	
+	return windowsConoutConnection;
+}
+
+var hasRequiredWindowsPtyAgent;
+
+function requireWindowsPtyAgent () {
+	if (hasRequiredWindowsPtyAgent) return windowsPtyAgent;
+	hasRequiredWindowsPtyAgent = 1;
+	/**
+	 * Copyright (c) 2012-2015, Christopher Jeffrey, Peter Sunde (MIT License)
+	 * Copyright (c) 2016, Daniel Imms (MIT License).
+	 * Copyright (c) 2018, Microsoft Corporation (MIT License).
+	 */
+	Object.defineProperty(windowsPtyAgent, "__esModule", { value: true });
+	windowsPtyAgent.argsToCommandLine = windowsPtyAgent.WindowsPtyAgent = void 0;
+	var fs = require$$0__default$1;
+	var os = require$$0__default;
+	var path = path__default;
+	var child_process_1 = require$$3$2;
+	var net_1 = require$$0$5;
+	var windowsConoutConnection_1 = requireWindowsConoutConnection();
+	var utils_1 = requireUtils();
+	var conptyNative;
+	var winptyNative;
+	/**
+	 * The amount of time to wait for additional data after the conpty shell process has exited before
+	 * shutting down the socket. The timer will be reset if a new data event comes in after the timer
+	 * has started.
+	 */
+	var FLUSH_DATA_INTERVAL = 1000;
+	/**
+	 * This agent sits between the WindowsTerminal class and provides a common interface for both conpty
+	 * and winpty.
+	 */
+	var WindowsPtyAgent = /** @class */ (function () {
+	    function WindowsPtyAgent(file, args, env, cwd, cols, rows, debug, _useConpty, _useConptyDll, conptyInheritCursor) {
+	        var _this = this;
+	        if (_useConptyDll === void 0) { _useConptyDll = false; }
+	        if (conptyInheritCursor === void 0) { conptyInheritCursor = false; }
+	        this._useConpty = _useConpty;
+	        this._useConptyDll = _useConptyDll;
+	        this._pid = 0;
+	        this._innerPid = 0;
+	        if (this._useConpty === undefined || this._useConpty === true) {
+	            this._useConpty = this._getWindowsBuildNumber() >= 18309;
+	        }
+	        if (this._useConpty) {
+	            if (!conptyNative) {
+	                conptyNative = utils_1.loadNativeModule('conpty').module;
+	            }
+	        }
+	        else {
+	            if (!winptyNative) {
+	                winptyNative = utils_1.loadNativeModule('pty').module;
+	            }
+	        }
+	        this._ptyNative = this._useConpty ? conptyNative : winptyNative;
+	        // Sanitize input variable.
+	        cwd = path.resolve(cwd);
+	        // Compose command line
+	        var commandLine = argsToCommandLine(file, args);
+	        // Open pty session.
+	        var term;
+	        if (this._useConpty) {
+	            term = this._ptyNative.startProcess(file, cols, rows, debug, this._generatePipeName(), conptyInheritCursor, this._useConptyDll);
+	        }
+	        else {
+	            term = this._ptyNative.startProcess(file, commandLine, env, cwd, cols, rows, debug);
+	            this._pid = term.pid;
+	            this._innerPid = term.innerPid;
+	        }
+	        // Not available on windows.
+	        this._fd = term.fd;
+	        // Generated incremental number that has no real purpose besides  using it
+	        // as a terminal id.
+	        this._pty = term.pty;
+	        // Create terminal pipe IPC channel and forward to a local unix socket.
+	        this._outSocket = new net_1.Socket();
+	        this._outSocket.setEncoding('utf8');
+	        // The conout socket must be ready out on another thread to avoid deadlocks
+	        this._conoutSocketWorker = new windowsConoutConnection_1.ConoutConnection(term.conout, this._useConptyDll);
+	        this._conoutSocketWorker.onReady(function () {
+	            _this._conoutSocketWorker.connectSocket(_this._outSocket);
+	        });
+	        this._outSocket.on('connect', function () {
+	            _this._outSocket.emit('ready_datapipe');
+	        });
+	        var inSocketFD = fs.openSync(term.conin, 'w');
+	        this._inSocket = new net_1.Socket({
+	            fd: inSocketFD,
+	            readable: false,
+	            writable: true
+	        });
+	        this._inSocket.setEncoding('utf8');
+	        if (this._useConpty) {
+	            var connect = this._ptyNative.connect(this._pty, commandLine, cwd, env, this._useConptyDll, function (c) { return _this._$onProcessExit(c); });
+	            this._innerPid = connect.pid;
+	        }
+	    }
+	    Object.defineProperty(WindowsPtyAgent.prototype, "inSocket", {
+	        get: function () { return this._inSocket; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Object.defineProperty(WindowsPtyAgent.prototype, "outSocket", {
+	        get: function () { return this._outSocket; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Object.defineProperty(WindowsPtyAgent.prototype, "fd", {
+	        get: function () { return this._fd; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Object.defineProperty(WindowsPtyAgent.prototype, "innerPid", {
+	        get: function () { return this._innerPid; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Object.defineProperty(WindowsPtyAgent.prototype, "pty", {
+	        get: function () { return this._pty; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    WindowsPtyAgent.prototype.resize = function (cols, rows) {
+	        if (this._useConpty) {
+	            if (this._exitCode !== undefined) {
+	                throw new Error('Cannot resize a pty that has already exited');
+	            }
+	            this._ptyNative.resize(this._pty, cols, rows, this._useConptyDll);
+	            return;
+	        }
+	        this._ptyNative.resize(this._pid, cols, rows);
+	    };
+	    WindowsPtyAgent.prototype.clear = function () {
+	        if (this._useConpty) {
+	            this._ptyNative.clear(this._pty, this._useConptyDll);
+	        }
+	    };
+	    WindowsPtyAgent.prototype.kill = function () {
+	        var _this = this;
+	        // Tell the agent to kill the pty, this releases handles to the process
+	        if (this._useConpty) {
+	            if (!this._useConptyDll) {
+	                this._inSocket.readable = false;
+	                this._outSocket.readable = false;
+	                this._getConsoleProcessList().then(function (consoleProcessList) {
+	                    consoleProcessList.forEach(function (pid) {
+	                        try {
+	                            process.kill(pid);
+	                        }
+	                        catch (e) {
+	                            // Ignore if process cannot be found (kill ESRCH error)
+	                        }
+	                    });
+	                });
+	                this._ptyNative.kill(this._pty, this._useConptyDll);
+	                this._conoutSocketWorker.dispose();
+	            }
+	            else {
+	                // Close the input write handle to signal the end of session.
+	                this._inSocket.destroy();
+	                this._ptyNative.kill(this._pty, this._useConptyDll);
+	                this._outSocket.on('data', function () {
+	                    _this._conoutSocketWorker.dispose();
+	                });
+	            }
+	        }
+	        else {
+	            // Because pty.kill closes the handle, it will kill most processes by itself.
+	            // Process IDs can be reused as soon as all handles to them are
+	            // dropped, so we want to immediately kill the entire console process list.
+	            // If we do not force kill all processes here, node servers in particular
+	            // seem to become detached and remain running (see
+	            // Microsoft/vscode#26807).
+	            var processList = this._ptyNative.getProcessList(this._pid);
+	            this._ptyNative.kill(this._pid, this._innerPid);
+	            processList.forEach(function (pid) {
+	                try {
+	                    process.kill(pid);
+	                }
+	                catch (e) {
+	                    // Ignore if process cannot be found (kill ESRCH error)
+	                }
+	            });
+	        }
+	    };
+	    WindowsPtyAgent.prototype._getConsoleProcessList = function () {
+	        var _this = this;
+	        return new Promise(function (resolve) {
+	            var agent = child_process_1.fork(path.join(__dirname, 'conpty_console_list_agent'), [_this._innerPid.toString()]);
+	            agent.on('message', function (message) {
+	                clearTimeout(timeout);
+	                resolve(message.consoleProcessList);
+	            });
+	            var timeout = setTimeout(function () {
+	                // Something went wrong, just send back the shell PID
+	                agent.kill();
+	                resolve([_this._innerPid]);
+	            }, 5000);
+	        });
+	    };
+	    Object.defineProperty(WindowsPtyAgent.prototype, "exitCode", {
+	        get: function () {
+	            if (this._useConpty) {
+	                return this._exitCode;
+	            }
+	            var winptyExitCode = this._ptyNative.getExitCode(this._innerPid);
+	            return winptyExitCode === -1 ? undefined : winptyExitCode;
+	        },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    WindowsPtyAgent.prototype._getWindowsBuildNumber = function () {
+	        var osVersion = (/(\d+)\.(\d+)\.(\d+)/g).exec(os.release());
+	        var buildNumber = 0;
+	        if (osVersion && osVersion.length === 4) {
+	            buildNumber = parseInt(osVersion[3]);
+	        }
+	        return buildNumber;
+	    };
+	    WindowsPtyAgent.prototype._generatePipeName = function () {
+	        return "conpty-" + Math.random() * 10000000;
+	    };
+	    /**
+	     * Triggered from the native side when a contpy process exits.
+	     */
+	    WindowsPtyAgent.prototype._$onProcessExit = function (exitCode) {
+	        var _this = this;
+	        this._exitCode = exitCode;
+	        if (!this._useConptyDll) {
+	            this._flushDataAndCleanUp();
+	            this._outSocket.on('data', function () { return _this._flushDataAndCleanUp(); });
+	        }
+	    };
+	    WindowsPtyAgent.prototype._flushDataAndCleanUp = function () {
+	        var _this = this;
+	        if (this._useConptyDll) {
+	            return;
+	        }
+	        if (this._closeTimeout) {
+	            clearTimeout(this._closeTimeout);
+	        }
+	        this._closeTimeout = setTimeout(function () { return _this._cleanUpProcess(); }, FLUSH_DATA_INTERVAL);
+	    };
+	    WindowsPtyAgent.prototype._cleanUpProcess = function () {
+	        if (this._useConptyDll) {
+	            return;
+	        }
+	        this._inSocket.readable = false;
+	        this._outSocket.readable = false;
+	        this._outSocket.destroy();
+	    };
+	    return WindowsPtyAgent;
+	}());
+	windowsPtyAgent.WindowsPtyAgent = WindowsPtyAgent;
+	// Convert argc/argv into a Win32 command-line following the escaping convention
+	// documented on MSDN (e.g. see CommandLineToArgvW documentation). Copied from
+	// winpty project.
+	function argsToCommandLine(file, args) {
+	    if (isCommandLine(args)) {
+	        if (args.length === 0) {
+	            return file;
+	        }
+	        return argsToCommandLine(file, []) + " " + args;
+	    }
+	    var argv = [file];
+	    Array.prototype.push.apply(argv, args);
+	    var result = '';
+	    for (var argIndex = 0; argIndex < argv.length; argIndex++) {
+	        if (argIndex > 0) {
+	            result += ' ';
+	        }
+	        var arg = argv[argIndex];
+	        // if it is empty or it contains whitespace and is not already quoted
+	        var hasLopsidedEnclosingQuote = xOr((arg[0] !== '"'), (arg[arg.length - 1] !== '"'));
+	        var hasNoEnclosingQuotes = ((arg[0] !== '"') && (arg[arg.length - 1] !== '"'));
+	        var quote = arg === '' ||
+	            (arg.indexOf(' ') !== -1 ||
+	                arg.indexOf('\t') !== -1) &&
+	                ((arg.length > 1) &&
+	                    (hasLopsidedEnclosingQuote || hasNoEnclosingQuotes));
+	        if (quote) {
+	            result += '\"';
+	        }
+	        var bsCount = 0;
+	        for (var i = 0; i < arg.length; i++) {
+	            var p = arg[i];
+	            if (p === '\\') {
+	                bsCount++;
+	            }
+	            else if (p === '"') {
+	                result += repeatText('\\', bsCount * 2 + 1);
+	                result += '"';
+	                bsCount = 0;
+	            }
+	            else {
+	                result += repeatText('\\', bsCount);
+	                bsCount = 0;
+	                result += p;
+	            }
+	        }
+	        if (quote) {
+	            result += repeatText('\\', bsCount * 2);
+	            result += '\"';
+	        }
+	        else {
+	            result += repeatText('\\', bsCount);
+	        }
+	    }
+	    return result;
+	}
+	windowsPtyAgent.argsToCommandLine = argsToCommandLine;
+	function isCommandLine(args) {
+	    return typeof args === 'string';
+	}
+	function repeatText(text, count) {
+	    var result = '';
+	    for (var i = 0; i < count; i++) {
+	        result += text;
+	    }
+	    return result;
+	}
+	function xOr(arg1, arg2) {
+	    return ((arg1 && !arg2) || (!arg1 && arg2));
+	}
+	
+	return windowsPtyAgent;
+}
+
+var hasRequiredWindowsTerminal;
+
+function requireWindowsTerminal () {
+	if (hasRequiredWindowsTerminal) return windowsTerminal;
+	hasRequiredWindowsTerminal = 1;
+	/**
+	 * Copyright (c) 2012-2015, Christopher Jeffrey, Peter Sunde (MIT License)
+	 * Copyright (c) 2016, Daniel Imms (MIT License).
+	 * Copyright (c) 2018, Microsoft Corporation (MIT License).
+	 */
+	var __extends = (windowsTerminal && windowsTerminal.__extends) || (function () {
+	    var extendStatics = function (d, b) {
+	        extendStatics = Object.setPrototypeOf ||
+	            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	        return extendStatics(d, b);
+	    };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(windowsTerminal, "__esModule", { value: true });
+	windowsTerminal.WindowsTerminal = void 0;
+	var terminal_1 = requireTerminal();
+	var windowsPtyAgent_1 = requireWindowsPtyAgent();
+	var utils_1 = requireUtils();
+	var DEFAULT_FILE = 'cmd.exe';
+	var DEFAULT_NAME = 'Windows Shell';
+	var WindowsTerminal = /** @class */ (function (_super) {
+	    __extends(WindowsTerminal, _super);
+	    function WindowsTerminal(file, args, opt) {
+	        var _this = _super.call(this, opt) || this;
+	        _this._checkType('args', args, 'string', true);
+	        // Initialize arguments
+	        args = args || [];
+	        file = file || DEFAULT_FILE;
+	        opt = opt || {};
+	        opt.env = opt.env || process.env;
+	        if (opt.encoding) {
+	            console.warn('Setting encoding on Windows is not supported');
+	        }
+	        var env = utils_1.assign({}, opt.env);
+	        _this._cols = opt.cols || terminal_1.DEFAULT_COLS;
+	        _this._rows = opt.rows || terminal_1.DEFAULT_ROWS;
+	        var cwd = opt.cwd || process.cwd();
+	        var name = opt.name || env.TERM || DEFAULT_NAME;
+	        var parsedEnv = _this._parseEnv(env);
+	        // If the terminal is ready
+	        _this._isReady = false;
+	        // Functions that need to run after `ready` event is emitted.
+	        _this._deferreds = [];
+	        // Create new termal.
+	        _this._agent = new windowsPtyAgent_1.WindowsPtyAgent(file, args, parsedEnv, cwd, _this._cols, _this._rows, false, opt.useConpty, opt.useConptyDll, opt.conptyInheritCursor);
+	        _this._socket = _this._agent.outSocket;
+	        // Not available until `ready` event emitted.
+	        _this._pid = _this._agent.innerPid;
+	        _this._fd = _this._agent.fd;
+	        _this._pty = _this._agent.pty;
+	        // The forked windows terminal is not available until `ready` event is
+	        // emitted.
+	        _this._socket.on('ready_datapipe', function () {
+	            // Run deferreds and set ready state once the first data event is received.
+	            _this._socket.once('data', function () {
+	                // Wait until the first data event is fired then we can run deferreds.
+	                if (!_this._isReady) {
+	                    // Terminal is now ready and we can avoid having to defer method
+	                    // calls.
+	                    _this._isReady = true;
+	                    // Execute all deferred methods
+	                    _this._deferreds.forEach(function (fn) {
+	                        // NB! In order to ensure that `this` has all its references
+	                        // updated any variable that need to be available in `this` before
+	                        // the deferred is run has to be declared above this forEach
+	                        // statement.
+	                        fn.run();
+	                    });
+	                    // Reset
+	                    _this._deferreds = [];
+	                }
+	            });
+	            // Shutdown if `error` event is emitted.
+	            _this._socket.on('error', function (err) {
+	                // Close terminal session.
+	                _this._close();
+	                // EIO, happens when someone closes our child process: the only process
+	                // in the terminal.
+	                // node < 0.6.14: errno 5
+	                // node >= 0.6.14: read EIO
+	                if (err.code) {
+	                    if (~err.code.indexOf('errno 5') || ~err.code.indexOf('EIO'))
+	                        return;
+	                }
+	                // Throw anything else.
+	                if (_this.listeners('error').length < 2) {
+	                    throw err;
+	                }
+	            });
+	            // Cleanup after the socket is closed.
+	            _this._socket.on('close', function () {
+	                _this.emit('exit', _this._agent.exitCode);
+	                _this._close();
+	            });
+	        });
+	        _this._file = file;
+	        _this._name = name;
+	        _this._readable = true;
+	        _this._writable = true;
+	        _this._forwardEvents();
+	        return _this;
+	    }
+	    WindowsTerminal.prototype._write = function (data) {
+	        this._defer(this._doWrite, data);
+	    };
+	    WindowsTerminal.prototype._doWrite = function (data) {
+	        this._agent.inSocket.write(data);
+	    };
+	    /**
+	     * openpty
+	     */
+	    WindowsTerminal.open = function (options) {
+	        throw new Error('open() not supported on windows, use Fork() instead.');
+	    };
+	    /**
+	     * TTY
+	     */
+	    WindowsTerminal.prototype.resize = function (cols, rows) {
+	        var _this = this;
+	        if (cols <= 0 || rows <= 0 || isNaN(cols) || isNaN(rows) || cols === Infinity || rows === Infinity) {
+	            throw new Error('resizing must be done using positive cols and rows');
+	        }
+	        this._deferNoArgs(function () {
+	            _this._agent.resize(cols, rows);
+	            _this._cols = cols;
+	            _this._rows = rows;
+	        });
+	    };
+	    WindowsTerminal.prototype.clear = function () {
+	        var _this = this;
+	        this._deferNoArgs(function () {
+	            _this._agent.clear();
+	        });
+	    };
+	    WindowsTerminal.prototype.destroy = function () {
+	        var _this = this;
+	        this._deferNoArgs(function () {
+	            _this.kill();
+	        });
+	    };
+	    WindowsTerminal.prototype.kill = function (signal) {
+	        var _this = this;
+	        this._deferNoArgs(function () {
+	            if (signal) {
+	                throw new Error('Signals not supported on windows.');
+	            }
+	            _this._close();
+	            _this._agent.kill();
+	        });
+	    };
+	    WindowsTerminal.prototype._deferNoArgs = function (deferredFn) {
+	        var _this = this;
+	        // If the terminal is ready, execute.
+	        if (this._isReady) {
+	            deferredFn.call(this);
+	            return;
+	        }
+	        // Queue until terminal is ready.
+	        this._deferreds.push({
+	            run: function () { return deferredFn.call(_this); }
+	        });
+	    };
+	    WindowsTerminal.prototype._defer = function (deferredFn, arg) {
+	        var _this = this;
+	        // If the terminal is ready, execute.
+	        if (this._isReady) {
+	            deferredFn.call(this, arg);
+	            return;
+	        }
+	        // Queue until terminal is ready.
+	        this._deferreds.push({
+	            run: function () { return deferredFn.call(_this, arg); }
+	        });
+	    };
+	    Object.defineProperty(WindowsTerminal.prototype, "process", {
+	        get: function () { return this._name; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Object.defineProperty(WindowsTerminal.prototype, "master", {
+	        get: function () { throw new Error('master is not supported on Windows'); },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Object.defineProperty(WindowsTerminal.prototype, "slave", {
+	        get: function () { throw new Error('slave is not supported on Windows'); },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    return WindowsTerminal;
+	}(terminal_1.Terminal));
+	windowsTerminal.WindowsTerminal = WindowsTerminal;
+	
+	return windowsTerminal;
+}
+
+var unixTerminal = {};
+
+var hasRequiredUnixTerminal;
+
+function requireUnixTerminal () {
+	if (hasRequiredUnixTerminal) return unixTerminal;
+	hasRequiredUnixTerminal = 1;
+	var __extends = (unixTerminal && unixTerminal.__extends) || (function () {
+	    var extendStatics = function (d, b) {
+	        extendStatics = Object.setPrototypeOf ||
+	            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	        return extendStatics(d, b);
+	    };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(unixTerminal, "__esModule", { value: true });
+	unixTerminal.UnixTerminal = void 0;
+	/**
+	 * Copyright (c) 2012-2015, Christopher Jeffrey (MIT License)
+	 * Copyright (c) 2016, Daniel Imms (MIT License).
+	 * Copyright (c) 2018, Microsoft Corporation (MIT License).
+	 */
+	var fs = require$$0__default$1;
+	var path = path__default;
+	var tty = require$$2$2;
+	var terminal_1 = requireTerminal();
+	var utils_1 = requireUtils();
+	var native = utils_1.loadNativeModule('pty');
+	var pty = native.module;
+	var helperPath = native.dir + '/spawn-helper';
+	helperPath = path.resolve(__dirname, helperPath);
+	helperPath = helperPath.replace('app.asar', 'app.asar.unpacked');
+	helperPath = helperPath.replace('node_modules.asar', 'node_modules.asar.unpacked');
+	var DEFAULT_FILE = 'sh';
+	var DEFAULT_NAME = 'xterm';
+	var DESTROY_SOCKET_TIMEOUT_MS = 200;
+	var UnixTerminal = /** @class */ (function (_super) {
+	    __extends(UnixTerminal, _super);
+	    function UnixTerminal(file, args, opt) {
+	        var _a, _b;
+	        var _this = _super.call(this, opt) || this;
+	        _this._boundClose = false;
+	        _this._emittedClose = false;
+	        if (typeof args === 'string') {
+	            throw new Error('args as a string is not supported on unix.');
+	        }
+	        // Initialize arguments
+	        args = args || [];
+	        file = file || DEFAULT_FILE;
+	        opt = opt || {};
+	        opt.env = opt.env || process.env;
+	        _this._cols = opt.cols || terminal_1.DEFAULT_COLS;
+	        _this._rows = opt.rows || terminal_1.DEFAULT_ROWS;
+	        var uid = (_a = opt.uid) !== null && _a !== void 0 ? _a : -1;
+	        var gid = (_b = opt.gid) !== null && _b !== void 0 ? _b : -1;
+	        var env = utils_1.assign({}, opt.env);
+	        if (opt.env === process.env) {
+	            _this._sanitizeEnv(env);
+	        }
+	        var cwd = opt.cwd || process.cwd();
+	        env.PWD = cwd;
+	        var name = opt.name || env.TERM || DEFAULT_NAME;
+	        env.TERM = name;
+	        var parsedEnv = _this._parseEnv(env);
+	        var encoding = (opt.encoding === undefined ? 'utf8' : opt.encoding);
+	        var onexit = function (code, signal) {
+	            // XXX Sometimes a data event is emitted after exit. Wait til socket is
+	            // destroyed.
+	            if (!_this._emittedClose) {
+	                if (_this._boundClose) {
+	                    return;
+	                }
+	                _this._boundClose = true;
+	                // From macOS High Sierra 10.13.2 sometimes the socket never gets
+	                // closed. A timeout is applied here to avoid the terminal never being
+	                // destroyed when this occurs.
+	                var timeout_1 = setTimeout(function () {
+	                    timeout_1 = null;
+	                    // Destroying the socket now will cause the close event to fire
+	                    _this._socket.destroy();
+	                }, DESTROY_SOCKET_TIMEOUT_MS);
+	                _this.once('close', function () {
+	                    if (timeout_1 !== null) {
+	                        clearTimeout(timeout_1);
+	                    }
+	                    _this.emit('exit', code, signal);
+	                });
+	                return;
+	            }
+	            _this.emit('exit', code, signal);
+	        };
+	        // fork
+	        var term = pty.fork(file, args, parsedEnv, cwd, _this._cols, _this._rows, uid, gid, (encoding === 'utf8'), helperPath, onexit);
+	        _this._socket = new tty.ReadStream(term.fd);
+	        if (encoding !== null) {
+	            _this._socket.setEncoding(encoding);
+	        }
+	        _this._writeStream = new CustomWriteStream(term.fd, (encoding || undefined));
+	        // setup
+	        _this._socket.on('error', function (err) {
+	            // NOTE: fs.ReadStream gets EAGAIN twice at first:
+	            if (err.code) {
+	                if (~err.code.indexOf('EAGAIN')) {
+	                    return;
+	                }
+	            }
+	            // close
+	            _this._close();
+	            // EIO on exit from fs.ReadStream:
+	            if (!_this._emittedClose) {
+	                _this._emittedClose = true;
+	                _this.emit('close');
+	            }
+	            // EIO, happens when someone closes our child process: the only process in
+	            // the terminal.
+	            // node < 0.6.14: errno 5
+	            // node >= 0.6.14: read EIO
+	            if (err.code) {
+	                if (~err.code.indexOf('errno 5') || ~err.code.indexOf('EIO')) {
+	                    return;
+	                }
+	            }
+	            // throw anything else
+	            if (_this.listeners('error').length < 2) {
+	                throw err;
+	            }
+	        });
+	        _this._pid = term.pid;
+	        _this._fd = term.fd;
+	        _this._pty = term.pty;
+	        _this._file = file;
+	        _this._name = name;
+	        _this._readable = true;
+	        _this._writable = true;
+	        _this._socket.on('close', function () {
+	            if (_this._emittedClose) {
+	                return;
+	            }
+	            _this._emittedClose = true;
+	            _this._close();
+	            _this.emit('close');
+	        });
+	        _this._forwardEvents();
+	        return _this;
+	    }
+	    Object.defineProperty(UnixTerminal.prototype, "master", {
+	        get: function () { return this._master; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Object.defineProperty(UnixTerminal.prototype, "slave", {
+	        get: function () { return this._slave; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    UnixTerminal.prototype._write = function (data) {
+	        this._writeStream.write(data);
+	    };
+	    Object.defineProperty(UnixTerminal.prototype, "fd", {
+	        /* Accessors */
+	        get: function () { return this._fd; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    Object.defineProperty(UnixTerminal.prototype, "ptsName", {
+	        get: function () { return this._pty; },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    /**
+	     * openpty
+	     */
+	    UnixTerminal.open = function (opt) {
+	        var self = Object.create(UnixTerminal.prototype);
+	        opt = opt || {};
+	        if (arguments.length > 1) {
+	            opt = {
+	                cols: arguments[1],
+	                rows: arguments[2]
+	            };
+	        }
+	        var cols = opt.cols || terminal_1.DEFAULT_COLS;
+	        var rows = opt.rows || terminal_1.DEFAULT_ROWS;
+	        var encoding = (opt.encoding === undefined ? 'utf8' : opt.encoding);
+	        // open
+	        var term = pty.open(cols, rows);
+	        self._master = new tty.ReadStream(term.master);
+	        if (encoding !== null) {
+	            self._master.setEncoding(encoding);
+	        }
+	        self._master.resume();
+	        self._slave = new tty.ReadStream(term.slave);
+	        if (encoding !== null) {
+	            self._slave.setEncoding(encoding);
+	        }
+	        self._slave.resume();
+	        self._socket = self._master;
+	        self._pid = -1;
+	        self._fd = term.master;
+	        self._pty = term.pty;
+	        self._file = process.argv[0] || 'node';
+	        self._name = process.env.TERM || '';
+	        self._readable = true;
+	        self._writable = true;
+	        self._socket.on('error', function (err) {
+	            self._close();
+	            if (self.listeners('error').length < 2) {
+	                throw err;
+	            }
+	        });
+	        self._socket.on('close', function () {
+	            self._close();
+	        });
+	        return self;
+	    };
+	    UnixTerminal.prototype.destroy = function () {
+	        var _this = this;
+	        this._close();
+	        // Need to close the read stream so node stops reading a dead file
+	        // descriptor. Then we can safely SIGHUP the shell.
+	        this._socket.once('close', function () {
+	            _this.kill('SIGHUP');
+	        });
+	        this._socket.destroy();
+	        this._writeStream.dispose();
+	    };
+	    UnixTerminal.prototype.kill = function (signal) {
+	        try {
+	            process.kill(this.pid, signal || 'SIGHUP');
+	        }
+	        catch (e) { /* swallow */ }
+	    };
+	    Object.defineProperty(UnixTerminal.prototype, "process", {
+	        /**
+	         * Gets the name of the process.
+	         */
+	        get: function () {
+	            if (process.platform === 'darwin') {
+	                var title = pty.process(this._fd);
+	                return (title !== 'kernel_task') ? title : this._file;
+	            }
+	            return pty.process(this._fd, this._pty) || this._file;
+	        },
+	        enumerable: false,
+	        configurable: true
+	    });
+	    /**
+	     * TTY
+	     */
+	    UnixTerminal.prototype.resize = function (cols, rows) {
+	        if (cols <= 0 || rows <= 0 || isNaN(cols) || isNaN(rows) || cols === Infinity || rows === Infinity) {
+	            throw new Error('resizing must be done using positive cols and rows');
+	        }
+	        pty.resize(this._fd, cols, rows);
+	        this._cols = cols;
+	        this._rows = rows;
+	    };
+	    UnixTerminal.prototype.clear = function () {
+	    };
+	    UnixTerminal.prototype._sanitizeEnv = function (env) {
+	        // Make sure we didn't start our server from inside tmux.
+	        delete env['TMUX'];
+	        delete env['TMUX_PANE'];
+	        // Make sure we didn't start our server from inside screen.
+	        // http://web.mit.edu/gnu/doc/html/screen_20.html
+	        delete env['STY'];
+	        delete env['WINDOW'];
+	        // Delete some variables that might confuse our terminal.
+	        delete env['WINDOWID'];
+	        delete env['TERMCAP'];
+	        delete env['COLUMNS'];
+	        delete env['LINES'];
+	    };
+	    return UnixTerminal;
+	}(terminal_1.Terminal));
+	unixTerminal.UnixTerminal = UnixTerminal;
+	/**
+	 * A custom write stream that writes directly to a file descriptor with proper
+	 * handling of backpressure and errors. This avoids some event loop exhaustion
+	 * issues that can occur when using the standard APIs in Node.
+	 */
+	var CustomWriteStream = /** @class */ (function () {
+	    function CustomWriteStream(_fd, _encoding) {
+	        this._fd = _fd;
+	        this._encoding = _encoding;
+	        this._writeQueue = [];
+	    }
+	    CustomWriteStream.prototype.dispose = function () {
+	        clearImmediate(this._writeImmediate);
+	        this._writeImmediate = undefined;
+	    };
+	    CustomWriteStream.prototype.write = function (data) {
+	        // Writes are put in a queue and processed asynchronously in order to handle
+	        // backpressure from the kernel buffer.
+	        var buffer = typeof data === 'string'
+	            ? Buffer.from(data, this._encoding)
+	            : Buffer.from(data);
+	        if (buffer.byteLength !== 0) {
+	            this._writeQueue.push({ buffer: buffer, offset: 0 });
+	            if (this._writeQueue.length === 1) {
+	                this._processWriteQueue();
+	            }
+	        }
+	    };
+	    CustomWriteStream.prototype._processWriteQueue = function () {
+	        var _this = this;
+	        this._writeImmediate = undefined;
+	        if (this._writeQueue.length === 0) {
+	            return;
+	        }
+	        var task = this._writeQueue[0];
+	        // Write to the underlying file descriptor and handle it directly, rather
+	        // than using the `net.Socket`/`tty.WriteStream` wrappers which swallow and
+	        // mask errors like EAGAIN and can cause the thread to block indefinitely.
+	        fs.write(this._fd, task.buffer, task.offset, function (err, written) {
+	            if (err) {
+	                if ('code' in err && err.code === 'EAGAIN') {
+	                    // `setImmediate` is used to yield to the event loop and re-attempt
+	                    // the write later.
+	                    _this._writeImmediate = setImmediate(function () { return _this._processWriteQueue(); });
+	                }
+	                else {
+	                    // Stop processing immediately on unexpected error and log
+	                    _this._writeQueue.length = 0;
+	                    console.error('Unhandled pty write error', err);
+	                }
+	                return;
+	            }
+	            task.offset += written;
+	            if (task.offset >= task.buffer.byteLength) {
+	                _this._writeQueue.shift();
+	            }
+	            // Since there is more room in the kernel buffer, we can continue to write
+	            // until we hit EAGAIN or exhaust the queue.
+	            //
+	            // Note that old versions of bash, like v3.2 which ships in macOS, appears
+	            // to have a bug in its readline implementation that causes data
+	            // corruption when writes to the pty happens too quickly. Instead of
+	            // trying to workaround that we just accept it so that large pastes are as
+	            // fast as possible.
+	            // Context: https://github.com/microsoft/node-pty/issues/833
+	            _this._processWriteQueue();
+	        });
+	    };
+	    return CustomWriteStream;
+	}());
+	
+	return unixTerminal;
+}
+
+var hasRequiredLib;
+
+function requireLib () {
+	if (hasRequiredLib) return lib;
+	hasRequiredLib = 1;
+	/**
+	 * Copyright (c) 2012-2015, Christopher Jeffrey, Peter Sunde (MIT License)
+	 * Copyright (c) 2016, Daniel Imms (MIT License).
+	 * Copyright (c) 2018, Microsoft Corporation (MIT License).
+	 */
+	Object.defineProperty(lib, "__esModule", { value: true });
+	lib.native = lib.open = lib.createTerminal = lib.fork = lib.spawn = void 0;
+	var utils_1 = requireUtils();
+	var terminalCtor;
+	if (process.platform === 'win32') {
+	    terminalCtor = requireWindowsTerminal().WindowsTerminal;
+	}
+	else {
+	    terminalCtor = requireUnixTerminal().UnixTerminal;
+	}
+	/**
+	 * Forks a process as a pseudoterminal.
+	 * @param file The file to launch.
+	 * @param args The file's arguments as argv (string[]) or in a pre-escaped
+	 * CommandLine format (string). Note that the CommandLine option is only
+	 * available on Windows and is expected to be escaped properly.
+	 * @param options The options of the terminal.
+	 * @throws When the file passed to spawn with does not exists.
+	 * @see CommandLineToArgvW https://msdn.microsoft.com/en-us/library/windows/desktop/bb776391(v=vs.85).aspx
+	 * @see Parsing C++ Comamnd-Line Arguments https://msdn.microsoft.com/en-us/library/17w5ykft.aspx
+	 * @see GetCommandLine https://msdn.microsoft.com/en-us/library/windows/desktop/ms683156.aspx
+	 */
+	function spawn(file, args, opt) {
+	    return new terminalCtor(file, args, opt);
+	}
+	lib.spawn = spawn;
+	/** @deprecated */
+	function fork(file, args, opt) {
+	    return new terminalCtor(file, args, opt);
+	}
+	lib.fork = fork;
+	/** @deprecated */
+	function createTerminal(file, args, opt) {
+	    return new terminalCtor(file, args, opt);
+	}
+	lib.createTerminal = createTerminal;
+	function open(options) {
+	    return terminalCtor.open(options);
+	}
+	lib.open = open;
+	/**
+	 * Expose the native API when not Windows, note that this is not public API and
+	 * could be removed at any time.
+	 */
+	lib.native = (process.platform !== 'win32' ? utils_1.loadNativeModule('pty').module : null);
+	
+	return lib;
+}
+
+var libExports = requireLib();
+
 /**
  * Ensures Node.js and npm are installed and meet minimum versions
  */
@@ -30153,7 +31566,7 @@ async function ensureNodeAndNpm(platformInfo, minNodeMajor = 24, minNpmMajor = 1
     coreExports.info(`Downloading Node.js from ${baseUrl}`);
 
     const shasumsPath = await toolCacheExports.downloadTool(`${baseUrl}SHASUMS256.txt`);
-    const shasums = require$$1.readFileSync(shasumsPath, 'utf8');
+    const shasums = require$$0.readFileSync(shasumsPath, 'utf8');
 
     const filename = resolveNodeFilename(shasums, platformInfo.platform, platformInfo.arch);
     const downloadUrl = `${baseUrl}${filename}`;
@@ -30168,7 +31581,7 @@ async function ensureNodeAndNpm(platformInfo, minNodeMajor = 24, minNpmMajor = 1
       extractedPath = await toolCacheExports.extractTar(archivePath);
     }
 
-    const entries = require$$1.readdirSync(extractedPath);
+    const entries = require$$0.readdirSync(extractedPath);
     const rootEntry = entries.length === 1 ? entries[0] : null;
     const rootPath = rootEntry ? path.join(extractedPath, rootEntry) : extractedPath;
     const binPath = platformInfo.platform === 'windows'
@@ -30247,8 +31660,8 @@ function validateVersion(version) {
  * Detects the current platform and architecture
  */
 function getPlatformInfo() {
-  const platform = require$$0.platform();
-  const arch = require$$0.arch();
+  const platform = require$$0$1.platform();
+  const arch = require$$0$1.arch();
   
   coreExports.info(`Detected platform: ${platform}`);
   coreExports.info(`Detected architecture: ${arch}`);
@@ -30314,7 +31727,7 @@ async function installViaScript(version, platformInfo) {
   try {
     // Download the install script
     const scriptUrl = 'https://gh.io/copilot-install';
-    const scriptPath = path.join(require$$0.tmpdir(), 'copilot-install.sh');
+    const scriptPath = path.join(require$$0$1.tmpdir(), 'copilot-install.sh');
     
     coreExports.info(`Downloading install script from ${scriptUrl}`);
     const downloadedPath = await toolCacheExports.downloadTool(scriptUrl, scriptPath);
@@ -30331,7 +31744,7 @@ async function installViaScript(version, platformInfo) {
     }
     
     // Set PREFIX to install in a location accessible to the workflow
-    const installDir = path.join(require$$0.homedir(), '.local');
+    const installDir = path.join(require$$0$1.homedir(), '.local');
     env.PREFIX = installDir;
     coreExports.info(`Setting PREFIX=${installDir}`);
     
@@ -30377,55 +31790,45 @@ async function verifyWithToken(tokenSource) {
   coreExports.info(`Validating Copilot CLI startup using ${tokenSource}...`);
 
   const combinedOutput = await new Promise((resolve, reject) => {
-    // Copilot CLI runs in interactive mode by default, so we spawn it directly
-    // to capture early output, wait briefly, then exit with Ctrl+C.
-    const child = spawn('copilot', [], {
-      // Use a shell so `copilot` resolves from PATH on all platforms.
-      shell: true,
-      // Pipe output so we can inspect login/welcome messages.
-      stdio: ['pipe', 'pipe', 'pipe']
+    // We use Copilot CLI here with interactive TTY. Use node-pty to provide one,
+    // capture early output, then exit with Ctrl+C.
+    const ptyProcess = libExports.spawn('copilot', ['-i'], {
+      name: 'xterm-color',
+      cols: 80,
+      rows: 24,
+      cwd: process.cwd(),
+      env: process.env
     });
 
-    let output = '';
-    let errorOutput = '';
-
-    const append = (data, target) => {
+    const chunks = [];
+    ptyProcess.onData((data) => {
       if (data) {
-        target.push(data.toString());
+        chunks.push(data.toString());
       }
-    };
-
-    const outChunks = [];
-    const errChunks = [];
-
-    child.stdout.on('data', (data) => append(data, outChunks));
-    child.stderr.on('data', (data) => append(data, errChunks));
+    });
 
     // Give the CLI time to print startup/auth output, then send Ctrl+C twice
     // to gracefully stop the interactive session.
     const killAfter = setTimeout(() => {
-      child.kill('SIGINT');
-      setTimeout(() => child.kill('SIGINT'), 250);
+      ptyProcess.write('\x03');
+      setTimeout(() => ptyProcess.write('\x03'), 250);
     }, 5000);
 
-    // Safety net to avoid hanging if SIGINT is ignored.
+    // Safety net to avoid hanging if Ctrl+C is ignored.
     const hardKill = setTimeout(() => {
-      child.kill('SIGTERM');
+      ptyProcess.kill();
     }, 8000);
 
-    child.on('error', (error) => {
+    ptyProcess.onExit((event) => {
       clearTimeout(killAfter);
       clearTimeout(hardKill);
-      reject(error);
-    });
-
-    // When the process exits, combine stdout+stderr for validation.
-    child.on('close', () => {
-      clearTimeout(killAfter);
-      clearTimeout(hardKill);
-      output = outChunks.join('');
-      errorOutput = errChunks.join('');
-      resolve(`${output}\n${errorOutput}`);
+      if (event.exitCode !== 0 && chunks.length === 0) {
+        reject(new Error(`Copilot CLI exited with code ${event.exitCode}.`));
+        return;
+      }
+      const output = chunks.join('');
+      coreExports.info(`Copilot CLI TTY output:\n${output}`);
+      resolve(output);
     });
   });
 

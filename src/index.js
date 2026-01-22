@@ -4,7 +4,7 @@ import * as tc from '@actions/tool-cache';
 import * as io from '@actions/io';
 import * as os from 'os';
 import * as path from 'path';
-import { spawn } from 'child_process';
+import * as pty from 'node-pty';
 import { ensureNodeAndNpm } from './nodeUtils.js';
 
 /**
@@ -161,55 +161,45 @@ async function verifyWithToken(tokenSource) {
   core.info(`Validating Copilot CLI startup using ${tokenSource}...`);
 
   const combinedOutput = await new Promise((resolve, reject) => {
-    // Copilot CLI runs in interactive mode by default, so we spawn it directly
-    // to capture early output, wait briefly, then exit with Ctrl+C.
-    const child = spawn('copilot', [], {
-      // Use a shell so `copilot` resolves from PATH on all platforms.
-      shell: true,
-      // Pipe output so we can inspect login/welcome messages.
-      stdio: ['pipe', 'pipe', 'pipe']
+    // We use Copilot CLI here with interactive TTY. Use node-pty to provide one,
+    // capture early output, then exit with Ctrl+C.
+    const ptyProcess = pty.spawn('copilot', ['-i'], {
+      name: 'xterm-color',
+      cols: 80,
+      rows: 24,
+      cwd: process.cwd(),
+      env: process.env
     });
 
-    let output = '';
-    let errorOutput = '';
-
-    const append = (data, target) => {
+    const chunks = [];
+    ptyProcess.onData((data) => {
       if (data) {
-        target.push(data.toString());
+        chunks.push(data.toString());
       }
-    };
-
-    const outChunks = [];
-    const errChunks = [];
-
-    child.stdout.on('data', (data) => append(data, outChunks));
-    child.stderr.on('data', (data) => append(data, errChunks));
+    });
 
     // Give the CLI time to print startup/auth output, then send Ctrl+C twice
     // to gracefully stop the interactive session.
     const killAfter = setTimeout(() => {
-      child.kill('SIGINT');
-      setTimeout(() => child.kill('SIGINT'), 250);
+      ptyProcess.write('\x03');
+      setTimeout(() => ptyProcess.write('\x03'), 250);
     }, 5000);
 
-    // Safety net to avoid hanging if SIGINT is ignored.
+    // Safety net to avoid hanging if Ctrl+C is ignored.
     const hardKill = setTimeout(() => {
-      child.kill('SIGTERM');
+      ptyProcess.kill();
     }, 8000);
 
-    child.on('error', (error) => {
+    ptyProcess.onExit((event) => {
       clearTimeout(killAfter);
       clearTimeout(hardKill);
-      reject(error);
-    });
-
-    // When the process exits, combine stdout+stderr for validation.
-    child.on('close', () => {
-      clearTimeout(killAfter);
-      clearTimeout(hardKill);
-      output = outChunks.join('');
-      errorOutput = errChunks.join('');
-      resolve(`${output}\n${errorOutput}`);
+      if (event.exitCode !== 0 && chunks.length === 0) {
+        reject(new Error(`Copilot CLI exited with code ${event.exitCode}.`));
+        return;
+      }
+      const output = chunks.join('');
+      core.info(`Copilot CLI TTY output:\n${output}`);
+      resolve(output);
     });
   });
 
