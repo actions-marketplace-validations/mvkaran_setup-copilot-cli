@@ -105,7 +105,11 @@ export async function ensureNodeAndNpm(platformInfo, minNodeMajor = 24, minNpmMa
   let check = await checkVersions();
 
   if (!check.ok) {
-    core.warning('Node.js/npm not found or too old. Installing required versions...');
+    const detectedNode = check.nodeVersion ?? 'unknown';
+    const detectedNpm = check.npmVersion ?? 'unknown';
+    core.info(`Detected Node.js: ${detectedNode}; required: ${minNodeMajor}+`);
+    core.info(`Detected npm: ${detectedNpm}; required: ${minNpmMajor}+`);
+    core.info('Installing required Node.js/npm versions...');
     await installNodeAndNpm();
     check = await checkVersions();
   }

@@ -4,6 +4,7 @@ import * as tc from '@actions/tool-cache';
 import * as io from '@actions/io';
 import * as os from 'os';
 import * as path from 'path';
+import { spawn } from 'child_process';
 import { ensureNodeAndNpm } from './nodeUtils.js';
 
 /**
@@ -159,21 +160,59 @@ function normalizeVersion(version) {
 async function verifyWithToken(tokenSource) {
   core.info(`Validating Copilot CLI startup using ${tokenSource}...`);
 
-  let output = '';
-  let errorOutput = '';
-  await exec.exec('copilot', [], {
-    listeners: {
-      stdout: (data) => {
-        output += data.toString();
-      },
-      stderr: (data) => {
-        errorOutput += data.toString();
+  const combinedOutput = await new Promise((resolve, reject) => {
+    // Copilot CLI runs in interactive mode by default, so we spawn it directly
+    // to capture early output, wait briefly, then exit with Ctrl+C.
+    const child = spawn('copilot', [], {
+      // Use a shell so `copilot` resolves from PATH on all platforms.
+      shell: true,
+      // Pipe output so we can inspect login/welcome messages.
+      stdio: ['pipe', 'pipe', 'pipe']
+    });
+
+    let output = '';
+    let errorOutput = '';
+
+    const append = (data, target) => {
+      if (data) {
+        target.push(data.toString());
       }
-    },
-    silent: true
+    };
+
+    const outChunks = [];
+    const errChunks = [];
+
+    child.stdout.on('data', (data) => append(data, outChunks));
+    child.stderr.on('data', (data) => append(data, errChunks));
+
+    // Give the CLI time to print startup/auth output, then send Ctrl+C twice
+    // to gracefully stop the interactive session.
+    const killAfter = setTimeout(() => {
+      child.kill('SIGINT');
+      setTimeout(() => child.kill('SIGINT'), 250);
+    }, 2000);
+
+    // Safety net to avoid hanging if SIGINT is ignored.
+    const hardKill = setTimeout(() => {
+      child.kill('SIGTERM');
+    }, 5000);
+
+    child.on('error', (error) => {
+      clearTimeout(killAfter);
+      clearTimeout(hardKill);
+      reject(error);
+    });
+
+    // When the process exits, combine stdout+stderr for validation.
+    child.on('close', () => {
+      clearTimeout(killAfter);
+      clearTimeout(hardKill);
+      output = outChunks.join('');
+      errorOutput = errChunks.join('');
+      resolve(`${output}\n${errorOutput}`);
+    });
   });
 
-  const combinedOutput = `${output}\n${errorOutput}`;
   const loginPattern = /logged in as user|welcome\s+\S+/i;
 
   if (!loginPattern.test(combinedOutput)) {
