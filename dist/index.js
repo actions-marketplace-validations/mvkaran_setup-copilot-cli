@@ -30406,12 +30406,12 @@ async function verifyWithToken(tokenSource) {
     const killAfter = setTimeout(() => {
       child.kill('SIGINT');
       setTimeout(() => child.kill('SIGINT'), 250);
-    }, 2000);
+    }, 5000);
 
     // Safety net to avoid hanging if SIGINT is ignored.
     const hardKill = setTimeout(() => {
       child.kill('SIGTERM');
-    }, 5000);
+    }, 8000);
 
     child.on('error', (error) => {
       clearTimeout(killAfter);
@@ -30432,7 +30432,11 @@ async function verifyWithToken(tokenSource) {
   const loginPattern = /logged in as user|welcome\s+\S+/i;
 
   if (!loginPattern.test(combinedOutput)) {
-    throw new Error(`Copilot CLI did not emit a logged-in/welcome message. Validation attempted with ${tokenSource}. Ensure the token is valid and has Copilot access.`);
+    throw new Error(
+      `Copilot CLI did not emit a logged-in/welcome message. Validation attempted with ${tokenSource}. `
+      + `Expected output to include "logged in as user" or "welcome <username>". `
+      + `Captured output:\n${combinedOutput}`
+    );
   }
 }
 
