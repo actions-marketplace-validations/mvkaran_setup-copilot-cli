@@ -4,6 +4,7 @@ import * as tc from '@actions/tool-cache';
 import * as io from '@actions/io';
 import * as os from 'os';
 import * as path from 'path';
+import { ensureNodeAndNpm } from './nodeUtils.js';
 
 /**
  * Validates the version input
@@ -54,6 +55,7 @@ function getPlatformInfo() {
   
   return { platform: platformName, arch };
 }
+
 
 /**
  * Installs Copilot CLI using npm
@@ -135,52 +137,93 @@ async function installViaScript(version, platformInfo) {
 /**
  * Verifies the installation and tests if Copilot CLI can be started
  */
-async function verifyInstallation() {
+async function getCopilotVersion() {
+  let versionOutput = '';
+  await exec.exec('copilot', ['-v'], {
+    listeners: {
+      stdout: (data) => {
+        versionOutput += data.toString();
+      }
+    },
+    silent: true
+  });
+
+  return versionOutput.trim();
+}
+
+function normalizeVersion(version) {
+  if (!version) return '';
+  return version.trim().replace(/^v/, '');
+}
+
+async function verifyWithToken(tokenSource) {
+  core.info(`Validating Copilot CLI startup using ${tokenSource}...`);
+
+  let output = '';
+  let errorOutput = '';
+  await exec.exec('copilot', [], {
+    listeners: {
+      stdout: (data) => {
+        output += data.toString();
+      },
+      stderr: (data) => {
+        errorOutput += data.toString();
+      }
+    },
+    silent: true
+  });
+
+  const combinedOutput = `${output}\n${errorOutput}`;
+  const loginPattern = /logged in as user|welcome\s+\S+/i;
+
+  if (!loginPattern.test(combinedOutput)) {
+    throw new Error(`Copilot CLI did not emit a logged-in/welcome message. Validation attempted with ${tokenSource}. Ensure the token is valid and has Copilot access.`);
+  }
+}
+
+async function verifyWithoutToken(requestedVersion) {
+  core.info('Validating Copilot CLI binary and version (token not provided)...');
+
+  const installedVersion = await getCopilotVersion();
+  core.info(`Copilot CLI version: ${installedVersion}`);
+
+  if (requestedVersion === 'latest' || requestedVersion === 'prerelease') {
+    return installedVersion;
+  }
+
+  const desired = normalizeVersion(requestedVersion);
+  const installed = normalizeVersion(installedVersion);
+
+  if (!installed.includes(desired)) {
+    throw new Error(`Installed Copilot CLI version (${installedVersion}) does not match requested version (${requestedVersion}).`);
+  }
+
+  return installedVersion;
+}
+
+async function verifyInstallation(requestedVersion, hasToken, tokenSource) {
   core.info('Verifying Copilot CLI installation...');
-  
+
   try {
-    // Try to find copilot in PATH
     const copilotPath = await io.which('copilot', false);
-    
+
     if (!copilotPath) {
       throw new Error('Copilot CLI not found in PATH');
     }
-    
+
     core.info(`Copilot CLI found at: ${copilotPath}`);
-    
-    // Get version
-    let versionOutput = '';
-    await exec.exec('copilot', ['--version'], {
-      listeners: {
-        stdout: (data) => {
-          versionOutput += data.toString();
-        }
-      },
-      silent: true
-    });
-    
-    const version = versionOutput.trim();
-    core.info(`Copilot CLI version: ${version}`);
-    
-    // Verify that Copilot CLI can be started by checking help command
-    core.info('Testing if Copilot CLI can be started...');
-    let helpOutput = '';
-    await exec.exec('copilot', ['--help'], {
-      listeners: {
-        stdout: (data) => {
-          helpOutput += data.toString();
-        }
-      },
-      silent: true
-    });
-    
-    // Check if help output contains expected content
-    if (!helpOutput || helpOutput.length === 0) {
-      throw new Error('Copilot CLI help command returned no output');
+
+    let version = null;
+
+    if (hasToken) {
+      await verifyWithToken(tokenSource);
+      version = await getCopilotVersion();
+      core.info(`✓ Copilot CLI started successfully using ${tokenSource}`);
+    } else {
+      version = await verifyWithoutToken(requestedVersion);
+      core.info('✓ Copilot CLI binary is available and version validated');
     }
-    
-    core.info('✓ Copilot CLI can be started successfully');
-    
+
     return { success: true, version, path: copilotPath };
   } catch (error) {
     core.warning(`Verification failed: ${error.message}`);
@@ -198,6 +241,17 @@ async function run() {
     // Get inputs
     const version = core.getInput('version') || 'latest';
     const token = core.getInput('token');
+    const envGhToken = process.env.GH_TOKEN;
+    const envGithubToken = process.env.GITHUB_TOKEN;
+    const tokenFromEnv = envGhToken || envGithubToken;
+    const hasToken = Boolean(token || tokenFromEnv);
+    const tokenSource = token
+      ? 'input token'
+      : envGhToken
+        ? 'GH_TOKEN env'
+        : envGithubToken
+          ? 'GITHUB_TOKEN env'
+          : 'no token';
     
     // Validate version input
     validateVersion(version);
@@ -206,8 +260,13 @@ async function run() {
     
     // Set GitHub token as environment variable if provided
     if (token) {
-      core.exportVariable('GITHUB_TOKEN', token);
-      core.info('GitHub token configured');
+      core.exportVariable('GH_TOKEN', token);
+      core.info('GH_TOKEN configured from input token');
+    } else if (envGhToken) {
+      core.info('Using existing GH_TOKEN from environment');
+    } else if (envGithubToken) {
+      core.exportVariable('GH_TOKEN', envGithubToken);
+      core.info('GH_TOKEN configured from GITHUB_TOKEN environment variable');
     }
     
     // Detect platform and architecture - this will throw if unsupported
@@ -218,6 +277,7 @@ async function run() {
     let installed = false;
     
     // Try npm first (works on all platforms)
+    await ensureNodeAndNpm(platformInfo);
     installed = await installVianpm(version);
     
     // If npm failed and we're on Linux/macOS, try the install script
@@ -231,7 +291,7 @@ async function run() {
     }
     
     // Verify installation and that CLI can be started
-    const verification = await verifyInstallation();
+    const verification = await verifyInstallation(version, hasToken, tokenSource);
     
     if (!verification.success) {
       throw new Error('Copilot CLI was installed but verification failed. The CLI cannot be started.');

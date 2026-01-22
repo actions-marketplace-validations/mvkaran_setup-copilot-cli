@@ -71,7 +71,7 @@ jobs:
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
 | `version` | Version of Copilot CLI to install. Can be `latest`, `prerelease`, or a specific version like `v0.0.369` | No | `latest` |
-| `token` | GitHub token for authentication | No | `${{ github.token }}` |
+| `token` | GitHub token for authentication (exported as `GH_TOKEN`). Recommended so the action can validate Copilot CLI startup. | No | `${{ github.token }}` |
 
 ## Outputs
 
@@ -110,13 +110,24 @@ If your workflow runs on an unsupported platform or architecture, the action wil
 - An active GitHub Copilot subscription. See [Copilot plans](https://github.com/features/copilot/plans).
 - If using Copilot via an organization, ensure it's not disabled by your organization administrator.
 
+### Authenticate with a Personal Access Token (PAT)
+
+Authenticate using a fine-grained PAT with the **Copilot Requests** permission enabled and pass it through the action input.
+
+1. Visit https://github.com/settings/personal-access-tokens/new
+2. Under **Permissions**, click **Add permissions** and select **Copilot Requests**
+3. Generate your token
+4. Pass the token to the action via the `token` input
+
+You can alternatively set the token directly via the environment variables `GH_TOKEN` or `GITHUB_TOKEN` (in order of precedence) and leave the `token` input blank; the CLI will authenticate using the first available token.
+
 ## How It Works
 
 1. Detects the runner's platform (Linux, macOS, Windows) and architecture (x64, arm64)
 2. Validates that the platform/architecture combination is supported
 3. Installs Copilot CLI using npm (works on all platforms)
 4. Falls back to the install script for Linux/macOS if npm installation fails
-5. Verifies the installation by checking version and testing if CLI can be started
+5. Verifies the installation. If `token` is provided, the action validates that Copilot CLI starts successfully. If no token is provided, the action only validates the binary is on PATH and the version matches the requested one.
 6. Adds Copilot CLI to the PATH for use in subsequent steps
 
 ## Troubleshooting
@@ -127,6 +138,8 @@ If the action fails to install Copilot CLI:
 - Check that your runner has internet access
 - Verify that npm is available on the runner
 - Check the action logs for specific error messages
+
+If verification fails and you provided `token`, ensure the token is valid for Copilot CLI and that it is passed as `token` (exported to `GH_TOKEN`). Without a token, the action only validates the binary and version, not runtime startup.
 
 ### Unsupported Platform/Architecture
 

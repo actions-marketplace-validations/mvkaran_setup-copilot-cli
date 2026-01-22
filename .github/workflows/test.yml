@@ -1,5 +1,20 @@
 name: Test Action
 
+# Test Suite: setup-copilot-cli
+# Scenarios:
+# 1) Token via input on all OSes -> validates CLI startup with GH_TOKEN set from input.
+#    Covered by: token-input-matrix
+# 2) Token via GH_TOKEN env (no input) -> validates env precedence and startup.
+#    Covered by: env-gh-token
+# 3) Token via GITHUB_TOKEN env (no input, GH_TOKEN missing) -> validates fallback and startup.
+#    Covered by: env-github-token
+# 4) No token, specific version -> validates binary presence and exact version match.
+#    Covered by: no-token-specific-version
+# 5) No token, prerelease -> validates install path without runtime auth.
+#    Covered by: no-token-prerelease
+# 6) No token, latest -> validates install path without runtime auth.
+#    Covered by: no-token-latest
+
 on:
   push:
     branches: [ main, copilot/** ]
@@ -8,65 +23,153 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-action-ubuntu:
-    name: Test on Ubuntu
+  token-input-matrix:
+    name: Token input on ${{ matrix.os }}
+    # Scenario 1: Validate token input path across OSes (startup validation).
+    if: secrets.COPILOT_TOKEN != ''
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub Copilot CLI (token input)
+        # Scenario 1: `token` input should export GH_TOKEN and allow startup validation.
+        id: setup-copilot
+        uses: ./
+        with:
+          version: 'latest'
+          token: ${{ secrets.COPILOT_TOKEN }}
+
+      - name: Verify installation
+        run: |
+          echo "Version: ${{ steps.setup-copilot.outputs.version }}"
+          echo "Path: ${{ steps.setup-copilot.outputs.path }}"
+          copilot -v
+
+  env-gh-token:
+    name: GH_TOKEN env (Ubuntu)
+    # Scenario 2: GH_TOKEN env should be used when token input is blank.
+    if: secrets.COPILOT_TOKEN != ''
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup GitHub Copilot CLI
+      - name: Setup GitHub Copilot CLI (GH_TOKEN env)
+        # Scenario 2: Use GH_TOKEN env (preferred) and validate startup.
         id: setup-copilot
         uses: ./
+        env:
+          GH_TOKEN: ${{ secrets.COPILOT_TOKEN }}
         with:
           version: 'latest'
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify installation
         run: |
           echo "Version: ${{ steps.setup-copilot.outputs.version }}"
           echo "Path: ${{ steps.setup-copilot.outputs.path }}"
-          copilot --version
-          copilot --help
+          copilot -v
 
-  test-action-macos:
-    name: Test on macOS
-    runs-on: macos-latest
+  env-github-token:
+    name: GITHUB_TOKEN env (Ubuntu)
+    # Scenario 3: GITHUB_TOKEN env should be used when GH_TOKEN is missing.
+    if: secrets.COPILOT_TOKEN != ''
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup GitHub Copilot CLI
+      - name: Setup GitHub Copilot CLI (GITHUB_TOKEN env)
+        # Scenario 3: Use GITHUB_TOKEN env fallback and validate startup.
         id: setup-copilot
         uses: ./
+        env:
+          GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
         with:
           version: 'latest'
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify installation
         run: |
           echo "Version: ${{ steps.setup-copilot.outputs.version }}"
           echo "Path: ${{ steps.setup-copilot.outputs.path }}"
-          copilot --version
-          copilot --help
+          copilot -v
 
-  test-action-windows:
-    name: Test on Windows
-    runs-on: windows-latest
+  no-token-specific-version:
+    name: No token (specific version)
+    # Scenario 4: No token -> only validate binary and exact version match.
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ''
+      GITHUB_TOKEN: ''
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup GitHub Copilot CLI
+      - name: Resolve latest Copilot CLI version
+        # Scenario 4: Resolve a specific version to assert exact match.
+        id: copilot-version
+        run: echo "version=$(npm view @github/copilot version)" >> $GITHUB_OUTPUT
+
+      - name: Setup GitHub Copilot CLI (no token)
+        # Scenario 4: No token provided; validation should be version-based only.
         id: setup-copilot
         uses: ./
         with:
-          version: 'latest'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          version: ${{ steps.copilot-version.outputs.version }}
 
       - name: Verify installation
         run: |
           echo "Version: ${{ steps.setup-copilot.outputs.version }}"
           echo "Path: ${{ steps.setup-copilot.outputs.path }}"
-          copilot --version
-          copilot --help
+          copilot -v
+
+  no-token-prerelease:
+    name: No token (prerelease)
+    # Scenario 5: No token -> prerelease install path without startup validation.
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ''
+      GITHUB_TOKEN: ''
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub Copilot CLI (prerelease)
+        # Scenario 5: `prerelease` skips token-based validation and checks binary.
+        id: setup-copilot
+        uses: ./
+        with:
+          version: 'prerelease'
+
+      - name: Verify installation
+        run: |
+          echo "Version: ${{ steps.setup-copilot.outputs.version }}"
+          echo "Path: ${{ steps.setup-copilot.outputs.path }}"
+          copilot -v
+
+  no-token-latest:
+    name: No token (latest)
+    # Scenario 6: No token -> latest install path without startup validation.
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ''
+      GITHUB_TOKEN: ''
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub Copilot CLI (latest)
+        # Scenario 6: `latest` skips token-based validation and checks binary.
+        id: setup-copilot
+        uses: ./
+        with:
+          version: 'latest'
+
+      - name: Verify installation
+        run: |
+          echo "Version: ${{ steps.setup-copilot.outputs.version }}"
+          echo "Path: ${{ steps.setup-copilot.outputs.path }}"
+          copilot -v

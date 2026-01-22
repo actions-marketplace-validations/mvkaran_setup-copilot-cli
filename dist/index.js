@@ -1,7 +1,8 @@
 import * as require$$0 from 'os';
 import require$$0__default from 'os';
 import require$$0$1 from 'crypto';
-import require$$1 from 'fs';
+import * as require$$1 from 'fs';
+import require$$1__default from 'fs';
 import * as path from 'path';
 import path__default from 'path';
 import require$$2 from 'http';
@@ -266,7 +267,7 @@ function requireFileCommand () {
 	// We use any as a valid input type
 	/* eslint-disable @typescript-eslint/no-explicit-any */
 	const crypto = __importStar(require$$0$1);
-	const fs = __importStar(require$$1);
+	const fs = __importStar(require$$1__default);
 	const os = __importStar(require$$0__default);
 	const utils_1 = requireUtils$1();
 	function issueFileCommand(command, message) {
@@ -25326,7 +25327,7 @@ function requireSummary () {
 		Object.defineProperty(exports$1, "__esModule", { value: true });
 		exports$1.summary = exports$1.markdownSummary = exports$1.SUMMARY_DOCS_URL = exports$1.SUMMARY_ENV_VAR = void 0;
 		const os_1 = require$$0__default;
-		const fs_1 = require$$1;
+		const fs_1 = require$$1__default;
 		const { access, appendFile, writeFile } = fs_1.promises;
 		exports$1.SUMMARY_ENV_VAR = 'GITHUB_STEP_SUMMARY';
 		exports$1.SUMMARY_DOCS_URL = 'https://docs.github.com/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary';
@@ -25747,7 +25748,7 @@ function requireIoUtil () {
 		exports$1.isRooted = isRooted;
 		exports$1.tryGetExecutablePath = tryGetExecutablePath;
 		exports$1.getCmdPath = getCmdPath;
-		const fs = __importStar(require$$1);
+		const fs = __importStar(require$$1__default);
 		const path = __importStar(path__default);
 		_a = fs.promises
 		// export const {open} = 'fs'
@@ -29221,7 +29222,7 @@ function requireManifest () {
 		/* eslint @typescript-eslint/no-require-imports: 0 */
 		const os = require$$0__default;
 		const cp = require$$2$2;
-		const fs = require$$1;
+		const fs = require$$1__default;
 		function _findMatch(versionSpec, stable, candidates, archFilter) {
 		    return __awaiter(this, void 0, void 0, function* () {
 		        const platFilter = os.platform();
@@ -29481,7 +29482,7 @@ function requireToolCache () {
 	const core = __importStar(requireCore());
 	const io = __importStar(requireIo());
 	const crypto = __importStar(require$$0$1);
-	const fs = __importStar(require$$1);
+	const fs = __importStar(require$$1__default);
 	const mm = __importStar(requireManifest());
 	const os = __importStar(require$$0__default);
 	const path = __importStar(path__default);
@@ -30104,6 +30105,121 @@ var toolCacheExports = requireToolCache();
 var ioExports = requireIo();
 
 /**
+ * Ensures Node.js and npm are installed and meet minimum versions
+ */
+async function ensureNodeAndNpm(platformInfo, minNodeMajor = 24, minNpmMajor = 10) {
+  const getVersion = async (command, args) => {
+    let output = '';
+    await execExports.exec(command, args, {
+      listeners: {
+        stdout: (data) => {
+          output += data.toString();
+        }
+      },
+      silent: true
+    });
+    return output.trim();
+  };
+
+  const parseMajor = (version) => {
+    const match = version.match(/v?(\d+)/);
+    return match ? Number(match[1]) : NaN;
+  };
+
+  const resolveNodeFilename = (shasums, platform, arch) => {
+    const suffix = (() => {
+      if (platform === 'windows') {
+        return arch === 'arm64' ? 'win-arm64.zip' : 'win-x64.zip';
+      }
+      if (platform === 'macos') {
+        return arch === 'arm64' ? 'darwin-arm64.tar.gz' : 'darwin-x64.tar.gz';
+      }
+      return arch === 'arm64' ? 'linux-arm64.tar.gz' : 'linux-x64.tar.gz';
+    })();
+
+    const line = shasums
+      .split(/\r?\n/)
+      .find((entry) => entry.includes(`-${suffix}`) && entry.includes('node-v'));
+
+    if (!line) {
+      throw new Error(`Unable to resolve Node.js binary for ${platform} ${arch}.`);
+    }
+
+    return line.trim().split(/\s+/).pop();
+  };
+
+  const installNodeAndNpm = async () => {
+    const baseUrl = `https://nodejs.org/dist/latest-v${minNodeMajor}.x/`;
+    coreExports.info(`Downloading Node.js from ${baseUrl}`);
+
+    const shasumsPath = await toolCacheExports.downloadTool(`${baseUrl}SHASUMS256.txt`);
+    const shasums = require$$1.readFileSync(shasumsPath, 'utf8');
+
+    const filename = resolveNodeFilename(shasums, platformInfo.platform, platformInfo.arch);
+    const downloadUrl = `${baseUrl}${filename}`;
+
+    coreExports.info(`Resolved Node.js package: ${filename}`);
+    const archivePath = await toolCacheExports.downloadTool(downloadUrl);
+
+    let extractedPath;
+    if (filename.endsWith('.zip')) {
+      extractedPath = await toolCacheExports.extractZip(archivePath);
+    } else {
+      extractedPath = await toolCacheExports.extractTar(archivePath);
+    }
+
+    const entries = require$$1.readdirSync(extractedPath);
+    const rootEntry = entries.length === 1 ? entries[0] : null;
+    const rootPath = rootEntry ? path.join(extractedPath, rootEntry) : extractedPath;
+    const binPath = platformInfo.platform === 'windows'
+      ? rootPath
+      : path.join(rootPath, 'bin');
+
+    coreExports.addPath(binPath);
+    coreExports.info(`Added Node.js to PATH: ${binPath}`);
+  };
+
+  const checkVersions = async () => {
+    const nodePath = await ioExports.which('node', false);
+    const npmPath = await ioExports.which('npm', false);
+
+    if (!nodePath || !npmPath) {
+      return { ok: false, nodeVersion: null, npmVersion: null };
+    }
+
+    const nodeVersion = await getVersion('node', ['--version']);
+    const npmVersion = await getVersion('npm', ['--version']);
+
+    const nodeMajor = parseMajor(nodeVersion);
+    const npmMajor = parseMajor(npmVersion);
+
+    const ok = Number.isFinite(nodeMajor)
+      && Number.isFinite(npmMajor)
+      && nodeMajor >= minNodeMajor
+      && npmMajor >= minNpmMajor;
+
+    return { ok, nodeVersion, npmVersion, nodeMajor, npmMajor };
+  };
+
+  let check = await checkVersions();
+
+  if (!check.ok) {
+    coreExports.warning('Node.js/npm not found or too old. Installing required versions...');
+    await installNodeAndNpm();
+    check = await checkVersions();
+  }
+
+  if (!check.ok) {
+    const detectedNode = check.nodeVersion ?? 'unknown';
+    const detectedNpm = check.npmVersion ?? 'unknown';
+    throw new Error(`Node.js ${minNodeMajor}+ and npm ${minNpmMajor}+ are required. Detected Node.js ${detectedNode}, npm ${detectedNpm}.`);
+  }
+
+  coreExports.info(`Node.js version OK: ${check.nodeVersion}`);
+  coreExports.info(`npm version OK: ${check.npmVersion}`);
+}
+
+/**
  * Validates the version input
  */
 function validateVersion(version) {
@@ -30152,6 +30268,7 @@ function getPlatformInfo() {
   
   return { platform: platformName, arch };
 }
+
 
 /**
  * Installs Copilot CLI using npm
@@ -30233,52 +30350,93 @@ async function installViaScript(version, platformInfo) {
 /**
  * Verifies the installation and tests if Copilot CLI can be started
  */
-async function verifyInstallation() {
+async function getCopilotVersion() {
+  let versionOutput = '';
+  await execExports.exec('copilot', ['-v'], {
+    listeners: {
+      stdout: (data) => {
+        versionOutput += data.toString();
+      }
+    },
+    silent: true
+  });
+
+  return versionOutput.trim();
+}
+
+function normalizeVersion(version) {
+  if (!version) return '';
+  return version.trim().replace(/^v/, '');
+}
+
+async function verifyWithToken(tokenSource) {
+  coreExports.info(`Validating Copilot CLI startup using ${tokenSource}...`);
+
+  let output = '';
+  let errorOutput = '';
+  await execExports.exec('copilot', [], {
+    listeners: {
+      stdout: (data) => {
+        output += data.toString();
+      },
+      stderr: (data) => {
+        errorOutput += data.toString();
+      }
+    },
+    silent: true
+  });
+
+  const combinedOutput = `${output}\n${errorOutput}`;
+  const loginPattern = /logged in as user|welcome\s+\S+/i;
+
+  if (!loginPattern.test(combinedOutput)) {
+    throw new Error(`Copilot CLI did not emit a logged-in/welcome message. Validation attempted with ${tokenSource}. Ensure the token is valid and has Copilot access.`);
+  }
+}
+
+async function verifyWithoutToken(requestedVersion) {
+  coreExports.info('Validating Copilot CLI binary and version (token not provided)...');
+
+  const installedVersion = await getCopilotVersion();
+  coreExports.info(`Copilot CLI version: ${installedVersion}`);
+
+  if (requestedVersion === 'latest' || requestedVersion === 'prerelease') {
+    return installedVersion;
+  }
+
+  const desired = normalizeVersion(requestedVersion);
+  const installed = normalizeVersion(installedVersion);
+
+  if (!installed.includes(desired)) {
+    throw new Error(`Installed Copilot CLI version (${installedVersion}) does not match requested version (${requestedVersion}).`);
+  }
+
+  return installedVersion;
+}
+
+async function verifyInstallation(requestedVersion, hasToken, tokenSource) {
   coreExports.info('Verifying Copilot CLI installation...');
-  
+
   try {
-    // Try to find copilot in PATH
     const copilotPath = await ioExports.which('copilot', false);
-    
+
     if (!copilotPath) {
       throw new Error('Copilot CLI not found in PATH');
     }
-    
+
     coreExports.info(`Copilot CLI found at: ${copilotPath}`);
-    
-    // Get version
-    let versionOutput = '';
-    await execExports.exec('copilot', ['--version'], {
-      listeners: {
-        stdout: (data) => {
-          versionOutput += data.toString();
-        }
-      },
-      silent: true
-    });
-    
-    const version = versionOutput.trim();
-    coreExports.info(`Copilot CLI version: ${version}`);
-    
-    // Verify that Copilot CLI can be started by checking help command
-    coreExports.info('Testing if Copilot CLI can be started...');
-    let helpOutput = '';
-    await execExports.exec('copilot', ['--help'], {
-      listeners: {
-        stdout: (data) => {
-          helpOutput += data.toString();
-        }
-      },
-      silent: true
-    });
-    
-    // Check if help output contains expected content
-    if (!helpOutput || helpOutput.length === 0) {
-      throw new Error('Copilot CLI help command returned no output');
+
+    let version = null;
+
+    if (hasToken) {
+      await verifyWithToken(tokenSource);
+      version = await getCopilotVersion();
+      coreExports.info(`✓ Copilot CLI started successfully using ${tokenSource}`);
+    } else {
+      version = await verifyWithoutToken(requestedVersion);
+      coreExports.info('✓ Copilot CLI binary is available and version validated');
     }
-    
-    coreExports.info('✓ Copilot CLI can be started successfully');
-    
+
     return { success: true, version, path: copilotPath };
   } catch (error) {
     coreExports.warning(`Verification failed: ${error.message}`);
@@ -30296,6 +30454,17 @@ async function run() {
     // Get inputs
     const version = coreExports.getInput('version') || 'latest';
     const token = coreExports.getInput('token');
+    const envGhToken = process.env.GH_TOKEN;
+    const envGithubToken = process.env.GITHUB_TOKEN;
+    const tokenFromEnv = envGhToken || envGithubToken;
+    const hasToken = Boolean(token || tokenFromEnv);
+    const tokenSource = token
+      ? 'input token'
+      : envGhToken
+        ? 'GH_TOKEN env'
+        : envGithubToken
+          ? 'GITHUB_TOKEN env'
+          : 'no token';
     
     // Validate version input
     validateVersion(version);
@@ -30304,8 +30473,13 @@ async function run() {
     
     // Set GitHub token as environment variable if provided
     if (token) {
-      coreExports.exportVariable('GITHUB_TOKEN', token);
-      coreExports.info('GitHub token configured');
+      coreExports.exportVariable('GH_TOKEN', token);
+      coreExports.info('GH_TOKEN configured from input token');
+    } else if (envGhToken) {
+      coreExports.info('Using existing GH_TOKEN from environment');
+    } else if (envGithubToken) {
+      coreExports.exportVariable('GH_TOKEN', envGithubToken);
+      coreExports.info('GH_TOKEN configured from GITHUB_TOKEN environment variable');
     }
     
     // Detect platform and architecture - this will throw if unsupported
@@ -30316,6 +30490,7 @@ async function run() {
     let installed = false;
     
     // Try npm first (works on all platforms)
+    await ensureNodeAndNpm(platformInfo);
     installed = await installVianpm(version);
     
     // If npm failed and we're on Linux/macOS, try the install script
@@ -30329,7 +30504,7 @@ async function run() {
     }
     
     // Verify installation and that CLI can be started
-    const verification = await verifyInstallation();
+    const verification = await verifyInstallation(version, hasToken, tokenSource);
     
     if (!verification.success) {
       throw new Error('Copilot CLI was installed but verification failed. The CLI cannot be started.');

@@ -11,7 +11,7 @@ inputs:
     required: false
     default: 'latest'
   token:
-    description: 'GitHub token for authentication'
+    description: 'GitHub token for authentication (exported as GH_TOKEN). Recommended so the action can validate that Copilot CLI starts successfully.'
     required: false
 
 outputs:
@@ -21,5 +21,5 @@ outputs:
     description: 'Path to the Copilot CLI executable'
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
