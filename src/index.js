@@ -159,7 +159,7 @@ function normalizeVersion(version) {
 async function verifyWithToken(tokenSource) {
   core.info(`Validating Copilot CLI startup using ${tokenSource}...`);
 
-  // Dynamically import node-pty (installed globally during setup)
+  // Dynamically import node-pty (installed locally during setup)
   const pty = await import('node-pty');
 
   const combinedOutput = await new Promise((resolve, reject) => {
