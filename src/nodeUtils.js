@@ -122,13 +122,4 @@ export async function ensureNodeAndNpm(platformInfo, minNodeMajor = 24, minNpmMa
 
   core.info(`Node.js version OK: ${check.nodeVersion}`);
   core.info(`npm version OK: ${check.npmVersion}`);
-
-  // Install node-pty locally for the action to use
-  core.info('Installing node-pty locally...');
-  try {
-    await exec.exec('npm', ['install', 'node-pty@1.0.0']);
-    core.info('node-pty installed successfully');
-  } catch (error) {
-    throw new Error(`Failed to install node-pty: ${error.message}`);
-  }
 }

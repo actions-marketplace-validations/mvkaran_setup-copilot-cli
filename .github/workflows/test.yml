@@ -2,17 +2,15 @@ name: Test Action
 
 # Test Suite: setup-copilot-cli
 # Scenarios:
-# 1) Token via input on all OSes -> validates CLI startup with GH_TOKEN set from input.
+# 1) Token via input on all OSes -> sets GH_TOKEN from input
 #    Covered by: token-input-matrix
-# 2) Token via GH_TOKEN env (no input) -> validates env precedence and startup.
+# 2) Token via GH_TOKEN env (no input) -> uses existing GH_TOKEN
 #    Covered by: env-gh-token
-# 3) Token via GITHUB_TOKEN env (no input, GH_TOKEN missing) -> validates fallback and startup.
-#    Covered by: env-github-token
-# 4) No token, specific version -> validates binary presence and exact version match.
+# 3) No token, specific version -> validates binary presence and exact version match
 #    Covered by: no-token-specific-version
-# 5) No token, prerelease -> validates install path without runtime auth.
+# 4) No token, prerelease -> validates install path only
 #    Covered by: no-token-prerelease
-# 6) No token, latest -> validates install path without runtime auth.
+# 5) No token, latest -> validates install path only
 #    Covered by: no-token-latest
 
 on:
@@ -25,7 +23,7 @@ on:
 jobs:
   token-input-matrix:
     name: Token input on ${{ matrix.os }}
-    # Scenario 1: Validate token input path across OSes (startup validation).
+    # Scenario 1: Token input should export GH_TOKEN for Copilot CLI to use
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -35,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup GitHub Copilot CLI (token input)
-        # Scenario 1: `token` input should export GH_TOKEN and allow startup validation.
+        # Scenario 1: `token` input exports GH_TOKEN for Copilot CLI
         id: setup-copilot
         uses: ./
         with:
@@ -50,14 +48,14 @@ jobs:
 
   env-gh-token:
     name: GH_TOKEN env (Ubuntu)
-    # Scenario 2: GH_TOKEN env should be used when token input is blank.
+    # Scenario 2: GH_TOKEN env should be used when token input is blank
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup GitHub Copilot CLI (GH_TOKEN env)
-        # Scenario 2: Use GH_TOKEN env (preferred) and validate startup.
+        # Scenario 2: Use GH_TOKEN env (Copilot CLI will use it)
         id: setup-copilot
         uses: ./
         env:
@@ -73,18 +71,16 @@ jobs:
 
   env-github-token:
     name: GITHUB_TOKEN env (Ubuntu)
-    # Scenario 3: GITHUB_TOKEN env should be used when GH_TOKEN is missing.
+    # Scenario 3: No token input, just verify install works
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup GitHub Copilot CLI (GITHUB_TOKEN env)
-        # Scenario 3: Use GITHUB_TOKEN env fallback and validate startup.
+      - name: Setup GitHub Copilot CLI (no token)
+        # Scenario 3: Install without token
         id: setup-copilot
         uses: ./
-        env:
-          GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
         with:
           version: 'latest'
 
@@ -96,22 +92,19 @@ jobs:
 
   no-token-specific-version:
     name: No token (specific version)
-    # Scenario 4: No token -> only validate binary and exact version match.
+    # Scenario 4: No token -> only validate binary and exact version match
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ''
-      GITHUB_TOKEN: ''
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Resolve latest Copilot CLI version
-        # Scenario 4: Resolve a specific version to assert exact match.
+        # Scenario 4: Resolve a specific version to assert exact match
         id: copilot-version
         run: echo "version=$(npm view @github/copilot version)" >> $GITHUB_OUTPUT
 
       - name: Setup GitHub Copilot CLI (no token)
-        # Scenario 4: No token provided; validation should be version-based only.
+        # Scenario 4: No token provided; validation is version-based only
         id: setup-copilot
         uses: ./
         with:
@@ -125,17 +118,14 @@ jobs:
 
   no-token-prerelease:
     name: No token (prerelease)
-    # Scenario 5: No token -> prerelease install path without startup validation.
+    # Scenario 5: No token -> prerelease install path only
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ''
-      GITHUB_TOKEN: ''
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup GitHub Copilot CLI (prerelease)
-        # Scenario 5: `prerelease` skips token-based validation and checks binary.
+        # Scenario 5: `prerelease` checks binary only
         id: setup-copilot
         uses: ./
         with:
@@ -149,17 +139,14 @@ jobs:
 
   no-token-latest:
     name: No token (latest)
-    # Scenario 6: No token -> latest install path without startup validation.
+    # Scenario 6: No token -> latest install path only
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ''
-      GITHUB_TOKEN: ''
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup GitHub Copilot CLI (latest)
-        # Scenario 6: `latest` skips token-based validation and checks binary.
+        # Scenario 6: `latest` checks binary only
         id: setup-copilot
         uses: ./
         with:

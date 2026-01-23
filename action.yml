@@ -11,7 +11,7 @@ inputs:
     required: false
     default: 'latest'
   token:
-    description: 'GitHub token for authentication (exported as GH_TOKEN). Recommended so the action can validate that Copilot CLI starts successfully.'
+    description: 'GitHub token for Copilot CLI authentication (exported as GH_TOKEN for convenience). The token is only needed when USING the CLI, not for installation. You can skip this and provide the token when running CLI commands instead.'
     required: false
 
 outputs:
